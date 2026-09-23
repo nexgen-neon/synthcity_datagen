@@ -1,0 +1,89 @@
+# =========================
+# Python
+# =========================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# Virtual Environment
+# =========================
+
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# uv
+# =========================
+
+.uv/
+
+# =========================
+# Environment / Secrets
+# =========================
+
+.env
+.env.*
+!.env.example
+
+# =========================
+# Data
+# =========================
+
+# Generated synthetic data
+data/synthetic/
+data/generated/
+
+# Generated datasets
+outputs/
+
+# =========================
+# SynthCity Models / Artifacts
+# =========================
+
+models/
+artifacts/
+checkpoints/
+
+# =========================
+# Testing / Coverage
+# =========================
+
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# =========================
+# Jupyter
+# =========================
+
+.ipynb_checkpoints/
+
+# =========================
+# IDE
+# =========================
+
+.vscode/
+.idea/
+
+# =========================
+# OS
+# =========================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Logs
+# =========================
+
+*.log
+
+.workspace/
