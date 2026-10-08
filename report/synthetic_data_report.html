@@ -1,0 +1,2754 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Synthetic Data Generation Report</title>
+<style>
+body{font-family:Inter,Segoe UI,Arial,sans-serif;background:#f5f7fb;color:#1f2937;margin:0;line-height:1.45}.wrap{max-width:1500px;margin:auto;padding:28px}header{background:#111827;color:white;border-radius:18px;padding:28px;margin-bottom:20px}h1{margin:0 0 8px;font-size:30px}h2{margin-top:32px}.sub{opacity:.82}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.card{background:white;border:1px solid #e5e7eb;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}.metric{font-size:25px;font-weight:700}.small{font-size:13px;color:#6b7280}.note{background:#fff;border-left:4px solid #6b7280;padding:14px;border-radius:8px;margin:14px 0}.legend span{display:inline-block;padding:6px 10px;border-radius:999px;margin-right:8px;font-size:12px;font-weight:700}.green{background:#dcfce7;color:#166534}.yellow{background:#fef3c7;color:#92400e}.red{background:#fee2e2;color:#991b1b}.table-wrap{overflow:auto;background:white;border:1px solid #e5e7eb;border-radius:14px}table{border-collapse:collapse;width:100%;min-width:1200px}th,td{border-bottom:1px solid #e5e7eb;padding:8px 9px;font-size:12px;text-align:left;white-space:nowrap}th{background:#eef2f7;font-weight:700;position:sticky;top:0}.divider{background:#111827!important;width:5px;padding:0!important}.rownum{background:#f8fafc;font-weight:700}.status{font-weight:800;text-align:center}.mini{min-width:0;margin:10px 0}.mini th,.mini td{white-space:normal}.profile-card{background:white;border:1px solid #e5e7eb;border-radius:12px;margin:10px 0;padding:12px}summary{cursor:pointer;font-size:15px}.type{font-size:11px;color:#64748b;margin-left:8px}.json-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}pre{background:#0f172a;color:#e5e7eb;padding:12px;border-radius:8px;overflow:auto;max-height:420px;font-size:11px}.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:900px){.two,.json-grid{grid-template-columns:1fr}}footer{margin-top:30px;color:#6b7280;font-size:12px}
+
+/* Clear Actual vs Synthetic visual separation */
+.compare-table{border:2px solid #94a3b8!important;border-radius:16px!important;overflow:hidden}
+.compare-table thead tr:first-child th{font-size:15px;text-align:center;padding:12px 8px;position:static}
+.compare-table thead tr:first-child th:nth-child(2){background:#dbeafe;color:#1e3a8a;border-right:0}
+.compare-table thead tr:first-child th:nth-child(4){background:#ffedd5;color:#9a3412}
+.compare-table thead tr:nth-child(2) th:nth-child(n+2):nth-child(-n+11){background:#eff6ff;color:#1e3a8a;border-bottom:3px solid #60a5fa}
+.compare-table thead tr:nth-child(2) th:nth-child(n+14):nth-child(-n+23){background:#fff7ed;color:#9a3412;border-bottom:3px solid #fb923c}
+.compare-table tbody td:nth-child(n+2):nth-child(-n+11){background:#f8fbff}
+.compare-table tbody td:nth-child(n+14):nth-child(-n+23){background:#fffaf5}
+.compare-table .divider{background:#334155!important;border-left:5px solid #334155!important;border-right:5px solid #334155!important;min-width:10px!important;width:10px!important}
+.compare-label{display:flex;justify-content:center;gap:18px;align-items:center;margin:0 0 12px;font-weight:800}
+.compare-label .actual{background:#dbeafe;color:#1e3a8a;border:2px solid #60a5fa;padding:8px 18px;border-radius:9px}
+.compare-label .synthetic{background:#ffedd5;color:#9a3412;border:2px solid #fb923c;padding:8px 18px;border-radius:9px}
+.compare-label .middle{font-size:12px;color:#475569}
+.method-card{background:white;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 2px 8px rgba(15,23,42,.05)}
+.method-card h3{margin-top:0;font-size:21px}.method-card h4{margin-bottom:6px}.method-tag{display:inline-block;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:800;margin-bottom:10px}.tested{background:#dcfce7;color:#166534}.limited{background:#fef3c7;color:#92400e}.research{background:#dbeafe;color:#1e40af}.failed{background:#fee2e2;color:#991b1b}
+.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.method-grid .box{background:#f8fafc;border-radius:12px;padding:14px;border:1px solid #e2e8f0}
+.flow{background:#0f172a;color:#e2e8f0;padding:13px 16px;border-radius:10px;font-family:Consolas,monospace;font-size:12px;overflow:auto}
+.method-table{min-width:700px}.method-table th{background:#e2e8f0}.method-table td{white-space:normal}
+.callout{border-left:5px solid #334155;background:#f8fafc;padding:14px;border-radius:9px;margin:12px 0}.callout.good{border-left-color:#16a34a}.callout.warn{border-left-color:#d97706}.callout.bad{border-left-color:#dc2626}
+@media(max-width:900px){.method-grid{grid-template-columns:1fr}.compare-label{flex-wrap:wrap}}
+</style></head><body><div class="wrap">
+<header><h1>CTGAN — HR Employee Attrition Synthetic Data Report</h1><div class="sub">Actual dataset vs CTGAN-generated synthetic dataset • 10-row visual comparison • 35-column profiling • statistical fidelity</div></header>
+<h2>1. Dataset Overview</h2><div class="grid">
+<div class="card"><div class="small">Actual rows</div><div class="metric">1,470</div><div class="small">35 columns</div></div>
+<div class="card"><div class="small">Synthetic rows</div><div class="metric">1,470</div><div class="small">35 columns</div></div>
+<div class="card"><div class="small">Actual missing values</div><div class="metric">0</div></div>
+<div class="card"><div class="small">Synthetic missing values</div><div class="metric">0</div></div>
+<div class="card"><div class="small">Actual duplicates</div><div class="metric">0</div></div>
+<div class="card"><div class="small">Synthetic duplicates</div><div class="metric">0</div></div></div>
+<div class="note"><b>Comparison basis:</b> Both files contain the same 35 column names and 1,470 rows. The visual comparison below uses 10 representative matching columns and the first 10 instances, exactly as requested.</div>
+<h2>2. Actual Data vs Synthetic Data — 10 Instances</h2><div class="note">The values below are taken directly from row 1–10 of the two CSV files. The 10 selected columns cover both numerical and categorical HR fields.</div>
+<div class="compare-label"><span class="actual">ACTUAL DATA</span><span class="middle">← same 10 columns • 10 instances →</span><span class="synthetic">SYNTHETIC DATA (CTGAN)</span></div><div class="table-wrap"><table class="compare-table"><thead><tr><th></th><th colspan="10">Actual Data</th><th class="divider"></th><th></th><th colspan="10">Synthetic Data</th></tr><tr><th>Row</th><th>Age</th><th>Attrition</th><th>BusinessTravel</th><th>Department</th><th>DistanceFromHome</th><th>EducationField</th><th>Gender</th><th>JobLevel</th><th>MonthlyIncome</th><th>OverTime</th><th class="divider"></th><th>Row</th><th>Age</th><th>Attrition</th><th>BusinessTravel</th><th>Department</th><th>DistanceFromHome</th><th>EducationField</th><th>Gender</th><th>JobLevel</th><th>MonthlyIncome</th><th>OverTime</th></tr></thead><tbody><tr><td class="rownum">1</td><td>41</td><td>Yes</td><td>Travel_Rarely</td><td>Sales</td><td>1</td><td>Life Sciences</td><td>Female</td><td>2</td><td>5993</td><td>Yes</td><td class="divider"></td><td class="rownum">1</td><td>24</td><td>Yes</td><td>Non-Travel</td><td>Sales</td><td>9</td><td>Marketing</td><td>Male</td><td>1</td><td>3769</td><td>Yes</td></tr><tr><td class="rownum">2</td><td>49</td><td>No</td><td>Travel_Frequently</td><td>Research &amp; Development</td><td>8</td><td>Life Sciences</td><td>Male</td><td>2</td><td>5130</td><td>No</td><td class="divider"></td><td class="rownum">2</td><td>51</td><td>No</td><td>Travel_Rarely</td><td>Research &amp; Development</td><td>9</td><td>Human Resources</td><td>Female</td><td>1</td><td>2263</td><td>No</td></tr><tr><td class="rownum">3</td><td>37</td><td>Yes</td><td>Travel_Rarely</td><td>Research &amp; Development</td><td>2</td><td>Other</td><td>Male</td><td>1</td><td>2090</td><td>Yes</td><td class="divider"></td><td class="rownum">3</td><td>32</td><td>Yes</td><td>Travel_Rarely</td><td>Sales</td><td>1</td><td>Marketing</td><td>Male</td><td>2</td><td>2739</td><td>Yes</td></tr><tr><td class="rownum">4</td><td>33</td><td>No</td><td>Travel_Frequently</td><td>Research &amp; Development</td><td>3</td><td>Life Sciences</td><td>Female</td><td>1</td><td>2909</td><td>Yes</td><td class="divider"></td><td class="rownum">4</td><td>22</td><td>Yes</td><td>Travel_Frequently</td><td>Research &amp; Development</td><td>9</td><td>Life Sciences</td><td>Male</td><td>1</td><td>2208</td><td>Yes</td></tr><tr><td class="rownum">5</td><td>27</td><td>No</td><td>Travel_Rarely</td><td>Research &amp; Development</td><td>2</td><td>Medical</td><td>Male</td><td>1</td><td>3468</td><td>No</td><td class="divider"></td><td class="rownum">5</td><td>31</td><td>Yes</td><td>Non-Travel</td><td>Research &amp; Development</td><td>1</td><td>Medical</td><td>Female</td><td>1</td><td>2002</td><td>No</td></tr><tr><td class="rownum">6</td><td>32</td><td>No</td><td>Travel_Frequently</td><td>Research &amp; Development</td><td>2</td><td>Life Sciences</td><td>Male</td><td>1</td><td>3068</td><td>No</td><td class="divider"></td><td class="rownum">6</td><td>38</td><td>No</td><td>Travel_Frequently</td><td>Research &amp; Development</td><td>12</td><td>Medical</td><td>Female</td><td>4</td><td>9921</td><td>No</td></tr><tr><td class="rownum">7</td><td>59</td><td>No</td><td>Travel_Rarely</td><td>Research &amp; Development</td><td>3</td><td>Medical</td><td>Female</td><td>1</td><td>2670</td><td>Yes</td><td class="divider"></td><td class="rownum">7</td><td>48</td><td>Yes</td><td>Travel_Frequently</td><td>Research &amp; Development</td><td>2</td><td>Life Sciences</td><td>Male</td><td>4</td><td>17074</td><td>No</td></tr><tr><td class="rownum">8</td><td>30</td><td>No</td><td>Travel_Rarely</td><td>Research &amp; Development</td><td>24</td><td>Life Sciences</td><td>Male</td><td>1</td><td>2693</td><td>No</td><td class="divider"></td><td class="rownum">8</td><td>51</td><td>No</td><td>Travel_Rarely</td><td>Research &amp; Development</td><td>18</td><td>Human Resources</td><td>Male</td><td>4</td><td>5355</td><td>Yes</td></tr><tr><td class="rownum">9</td><td>38</td><td>No</td><td>Travel_Frequently</td><td>Research &amp; Development</td><td>23</td><td>Life Sciences</td><td>Male</td><td>3</td><td>9526</td><td>No</td><td class="divider"></td><td class="rownum">9</td><td>35</td><td>No</td><td>Travel_Rarely</td><td>Research &amp; Development</td><td>2</td><td>Life Sciences</td><td>Male</td><td>1</td><td>1686</td><td>No</td></tr><tr><td class="rownum">10</td><td>36</td><td>No</td><td>Travel_Rarely</td><td>Research &amp; Development</td><td>27</td><td>Medical</td><td>Male</td><td>2</td><td>5237</td><td>No</td><td class="divider"></td><td class="rownum">10</td><td>35</td><td>No</td><td>Travel_Rarely</td><td>Sales</td><td>8</td><td>Life Sciences</td><td>Female</td><td>2</td><td>4418</td><td>Yes</td></tr></tbody></table></div>
+<h2>3. CTGAN — Synthetic Data Generation Method</h2>
+<div class="method-card">
+<span class="method-tag tested">MEASURED — CTGAN</span>
+<h3>CTGAN — Conditional Tabular GAN</h3>
+<p><b>CTGAN (Conditional Tabular GAN)</b> is a generative model designed specifically for tabular datasets. It learns patterns from numerical and categorical columns and then generates new rows that follow the learned patterns. In this project, the synthetic HR dataset shown above was generated using the <b>CTGAN plugin in SynthCity</b>.</p>
+<div class="flow">Actual HR data → CTGAN learns numerical + categorical patterns → generates new HR records → synthetic dataset → profiling → fidelity evaluation</div>
+<div class="method-grid">
+<div class="box"><h4>What we used</h4><ul><li>Dataset: <b>IBM HR Employee Attrition</b>.</li><li>Actual dataset: <b>1,470 rows × 35 columns</b>.</li><li>Synthetic dataset: <b>1,470 rows × 35 columns</b>.</li><li>The synthetic file was then profiled using the same profiling workflow as the actual dataset.</li><li>The profiling results are compared in the next section for <b>all 35 columns</b>.</li></ul></div>
+<div class="box"><h4>Why CTGAN is used here</h4><p>HR data contains a mixture of numerical values such as <b>Age</b>, <b>MonthlyIncome</b> and <b>YearsAtCompany</b>, as well as categorical values such as <b>Department</b>, <b>JobRole</b>, <b>Gender</b> and <b>BusinessTravel</b>. CTGAN is intended to learn relationships across these different types of tabular values and create new records without simply copying the original rows.</p><p><b>Important:</b> successfully generating 1,470 rows only tells us that the generation process completed. It does not by itself prove that the generated data has the same statistical properties as the real data. That is why the profiling and fidelity analysis below are performed separately.</p></div>
+</div>
+<div class="callout good"><b>Experiment flow:</b> The CTGAN-generated CSV is the <b>synthetic dataset</b> used for the profiling comparison below. The profiling section therefore checks whether the generated data preserves the characteristics observed in the original HR dataset.</div>
+</div>
+<h2>4. Profiling Comparison — All 35 Columns</h2><div class="legend"><span class="green">🟢 MATCH</span><span class="yellow">🟡 PARTIAL MISMATCH</span><span class="red">🔴 MISMATCH</span></div>
+<div class="note">For the summary metrics, green/yellow/red indicate how close the synthetic profile is to the actual profile. Numeric mean/std/min/max use relative-difference bands; categorical percentages use absolute-difference bands. These colors are a visual aid, not a substitute for statistical testing. Expand any column to see the full JSON profiling result for both datasets.</div>
+<details class="profile-card"><summary><b>Age</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>18</td><td>18</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>60</td><td>60</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>36.9238</td><td>37.3571</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>9.1323</td><td>9.8633</td><td class="status yellow">PARTIAL</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Age&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 18.0,
+    &quot;maximum&quot;: 60.0,
+    &quot;mean&quot;: 36.923809523809524,
+    &quot;median&quot;: 36.0,
+    &quot;standard_deviation&quot;: 9.13226569061538,
+    &quot;variance&quot;: 83.39827664399081,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 19.0,
+      &quot;5%&quot;: 24.0,
+      &quot;10%&quot;: 26.0,
+      &quot;25%&quot;: 30.0,
+      &quot;50%&quot;: 36.0,
+      &quot;75%&quot;: 43.0,
+      &quot;90%&quot;: 50.0,
+      &quot;95%&quot;: 54.0,
+      &quot;99%&quot;: 58.309999999999945
+    },
+    &quot;q1&quot;: 30.0,
+    &quot;q2&quot;: 36.0,
+    &quot;q3&quot;: 43.0,
+    &quot;iqr&quot;: 13.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 10.5,
+      &quot;upper_bound&quot;: 62.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Age&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 18.0,
+    &quot;maximum&quot;: 60.0,
+    &quot;mean&quot;: 37.357142857142854,
+    &quot;median&quot;: 35.0,
+    &quot;standard_deviation&quot;: 9.863334839173824,
+    &quot;variance&quot;: 97.28537414966013,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 22.0,
+      &quot;5%&quot;: 24.0,
+      &quot;10%&quot;: 26.0,
+      &quot;25%&quot;: 29.0,
+      &quot;50%&quot;: 35.0,
+      &quot;75%&quot;: 47.0,
+      &quot;90%&quot;: 52.0,
+      &quot;95%&quot;: 54.0,
+      &quot;99%&quot;: 57.0
+    },
+    &quot;q1&quot;: 29.0,
+    &quot;q2&quot;: 35.0,
+    &quot;q3&quot;: 47.0,
+    &quot;iqr&quot;: 18.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 2.0,
+      &quot;upper_bound&quot;: 74.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>Attrition</b> <span class="type">categorical</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Unique %</td><td>13.6054</td><td>13.6054</td><td class="status green">MATCH</td></tr><tr><td>Top value</td><td>No</td><td>No</td><td class="status ">—</td></tr><tr><td>Top frequency %</td><td>83.8776</td><td>74.1497</td><td class="status red">MISMATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Attrition&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 2,
+    &quot;unique_percentage&quot;: 0.13605442176870747,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;No&quot;,
+        &quot;frequency&quot;: 1233,
+        &quot;frequency_percentage&quot;: 83.87755102040816
+      },
+      {
+        &quot;value&quot;: &quot;Yes&quot;,
+        &quot;frequency&quot;: 237,
+        &quot;frequency_percentage&quot;: 16.122448979591837
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Attrition&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 2,
+    &quot;unique_percentage&quot;: 0.13605442176870747,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;No&quot;,
+        &quot;frequency&quot;: 1090,
+        &quot;frequency_percentage&quot;: 74.14965986394559
+      },
+      {
+        &quot;value&quot;: &quot;Yes&quot;,
+        &quot;frequency&quot;: 380,
+        &quot;frequency_percentage&quot;: 25.850340136054424
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>BusinessTravel</b> <span class="type">categorical</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Unique %</td><td>20.4082</td><td>20.4082</td><td class="status green">MATCH</td></tr><tr><td>Top value</td><td>Travel_Rarely</td><td>Travel_Rarely</td><td class="status ">—</td></tr><tr><td>Top frequency %</td><td>70.9524</td><td>64.7619</td><td class="status yellow">PARTIAL</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;BusinessTravel&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 3,
+    &quot;unique_percentage&quot;: 0.20408163265306123,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Travel_Rarely&quot;,
+        &quot;frequency&quot;: 1043,
+        &quot;frequency_percentage&quot;: 70.95238095238095
+      },
+      {
+        &quot;value&quot;: &quot;Travel_Frequently&quot;,
+        &quot;frequency&quot;: 277,
+        &quot;frequency_percentage&quot;: 18.843537414965986
+      },
+      {
+        &quot;value&quot;: &quot;Non-Travel&quot;,
+        &quot;frequency&quot;: 150,
+        &quot;frequency_percentage&quot;: 10.204081632653061
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;BusinessTravel&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 3,
+    &quot;unique_percentage&quot;: 0.20408163265306123,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Travel_Rarely&quot;,
+        &quot;frequency&quot;: 952,
+        &quot;frequency_percentage&quot;: 64.76190476190476
+      },
+      {
+        &quot;value&quot;: &quot;Travel_Frequently&quot;,
+        &quot;frequency&quot;: 366,
+        &quot;frequency_percentage&quot;: 24.897959183673468
+      },
+      {
+        &quot;value&quot;: &quot;Non-Travel&quot;,
+        &quot;frequency&quot;: 152,
+        &quot;frequency_percentage&quot;: 10.340136054421768
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>DailyRate</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>102</td><td>180</td><td class="status red">MISMATCH</td></tr><tr><td>Maximum</td><td>1,499.00</td><td>1,499.00</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>802.4857</td><td>860.3959</td><td class="status yellow">PARTIAL</td></tr><tr><td>Std Dev</td><td>403.3718</td><td>426.9142</td><td class="status yellow">PARTIAL</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;DailyRate&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 102.0,
+    &quot;maximum&quot;: 1499.0,
+    &quot;mean&quot;: 802.4857142857143,
+    &quot;median&quot;: 802.0,
+    &quot;standard_deviation&quot;: 403.3718286009121,
+    &quot;variance&quot;: 162708.8321088436,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 117.0,
+      &quot;5%&quot;: 165.35000000000002,
+      &quot;10%&quot;: 242.8,
+      &quot;25%&quot;: 465.0,
+      &quot;50%&quot;: 802.0,
+      &quot;75%&quot;: 1157.0,
+      &quot;90%&quot;: 1356.0,
+      &quot;95%&quot;: 1424.1,
+      &quot;99%&quot;: 1485.0
+    },
+    &quot;q1&quot;: 465.0,
+    &quot;q2&quot;: 802.0,
+    &quot;q3&quot;: 1157.0,
+    &quot;iqr&quot;: 692.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -573.0,
+      &quot;upper_bound&quot;: 2195.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;DailyRate&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 180.0,
+    &quot;maximum&quot;: 1499.0,
+    &quot;mean&quot;: 860.3959183673469,
+    &quot;median&quot;: 803.5,
+    &quot;standard_deviation&quot;: 426.91421621978265,
+    &quot;variance&quot;: 182255.74801055132,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 221.69,
+      &quot;5%&quot;: 271.0,
+      &quot;10%&quot;: 297.9,
+      &quot;25%&quot;: 394.0,
+      &quot;50%&quot;: 803.5,
+      &quot;75%&quot;: 1294.75,
+      &quot;90%&quot;: 1403.1,
+      &quot;95%&quot;: 1438.1,
+      &quot;99%&quot;: 1496.31
+    },
+    &quot;q1&quot;: 394.0,
+    &quot;q2&quot;: 803.5,
+    &quot;q3&quot;: 1294.75,
+    &quot;iqr&quot;: 900.75,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -957.125,
+      &quot;upper_bound&quot;: 2645.875
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>Department</b> <span class="type">categorical</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Unique %</td><td>20.4082</td><td>20.4082</td><td class="status green">MATCH</td></tr><tr><td>Top value</td><td>Research &amp; Development</td><td>Research &amp; Development</td><td class="status ">—</td></tr><tr><td>Top frequency %</td><td>65.3741</td><td>66.3265</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Department&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 3,
+    &quot;unique_percentage&quot;: 0.20408163265306123,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Research &amp; Development&quot;,
+        &quot;frequency&quot;: 961,
+        &quot;frequency_percentage&quot;: 65.37414965986395
+      },
+      {
+        &quot;value&quot;: &quot;Sales&quot;,
+        &quot;frequency&quot;: 446,
+        &quot;frequency_percentage&quot;: 30.34013605442177
+      },
+      {
+        &quot;value&quot;: &quot;Human Resources&quot;,
+        &quot;frequency&quot;: 63,
+        &quot;frequency_percentage&quot;: 4.285714285714286
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Department&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 3,
+    &quot;unique_percentage&quot;: 0.20408163265306123,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Research &amp; Development&quot;,
+        &quot;frequency&quot;: 975,
+        &quot;frequency_percentage&quot;: 66.3265306122449
+      },
+      {
+        &quot;value&quot;: &quot;Sales&quot;,
+        &quot;frequency&quot;: 438,
+        &quot;frequency_percentage&quot;: 29.795918367346943
+      },
+      {
+        &quot;value&quot;: &quot;Human Resources&quot;,
+        &quot;frequency&quot;: 57,
+        &quot;frequency_percentage&quot;: 3.877551020408163
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>DistanceFromHome</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>29</td><td>29</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>9.1925</td><td>9.466</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>8.1041</td><td>8.4795</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;DistanceFromHome&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 29.0,
+    &quot;mean&quot;: 9.19251700680272,
+    &quot;median&quot;: 7.0,
+    &quot;standard_deviation&quot;: 8.104106529671768,
+    &quot;variance&quot;: 65.6765426442686,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 7.0,
+      &quot;75%&quot;: 14.0,
+      &quot;90%&quot;: 23.0,
+      &quot;95%&quot;: 26.0,
+      &quot;99%&quot;: 29.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 7.0,
+    &quot;q3&quot;: 14.0,
+    &quot;iqr&quot;: 12.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -16.0,
+      &quot;upper_bound&quot;: 32.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;DistanceFromHome&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 29.0,
+    &quot;mean&quot;: 9.465986394557824,
+    &quot;median&quot;: 8.0,
+    &quot;standard_deviation&quot;: 8.479499059445352,
+    &quot;variance&quot;: 71.9019042991346,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 2.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 8.0,
+      &quot;75%&quot;: 12.0,
+      &quot;90%&quot;: 25.0,
+      &quot;95%&quot;: 27.0,
+      &quot;99%&quot;: 29.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 8.0,
+    &quot;q3&quot;: 12.0,
+    &quot;iqr&quot;: 10.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 50,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -13.0,
+      &quot;upper_bound&quot;: 27.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>Education</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>5</td><td>5</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>2.9129</td><td>2.9667</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>1.0238</td><td>0.9792</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Education&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 5.0,
+    &quot;mean&quot;: 2.912925170068027,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 1.023816529910261,
+    &quot;variance&quot;: 1.0482002869174885,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 4.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 5.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 4.0,
+    &quot;iqr&quot;: 2.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1.0,
+      &quot;upper_bound&quot;: 7.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Education&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 5.0,
+    &quot;mean&quot;: 2.966666666666667,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 0.9791592487778072,
+    &quot;variance&quot;: 0.9587528344671199,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 3.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 4.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 5.0
+    },
+    &quot;q1&quot;: 3.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 4.0,
+    &quot;iqr&quot;: 1.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 163,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 1.5,
+      &quot;upper_bound&quot;: 5.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>EducationField</b> <span class="type">categorical</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Unique %</td><td>40.8163</td><td>40.8163</td><td class="status green">MATCH</td></tr><tr><td>Top value</td><td>Life Sciences</td><td>Life Sciences</td><td class="status ">—</td></tr><tr><td>Top frequency %</td><td>41.2245</td><td>41.6327</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;EducationField&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 6,
+    &quot;unique_percentage&quot;: 0.40816326530612246,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Life Sciences&quot;,
+        &quot;frequency&quot;: 606,
+        &quot;frequency_percentage&quot;: 41.224489795918366
+      },
+      {
+        &quot;value&quot;: &quot;Medical&quot;,
+        &quot;frequency&quot;: 464,
+        &quot;frequency_percentage&quot;: 31.564625850340132
+      },
+      {
+        &quot;value&quot;: &quot;Marketing&quot;,
+        &quot;frequency&quot;: 159,
+        &quot;frequency_percentage&quot;: 10.816326530612246
+      },
+      {
+        &quot;value&quot;: &quot;Technical Degree&quot;,
+        &quot;frequency&quot;: 132,
+        &quot;frequency_percentage&quot;: 8.979591836734693
+      },
+      {
+        &quot;value&quot;: &quot;Other&quot;,
+        &quot;frequency&quot;: 82,
+        &quot;frequency_percentage&quot;: 5.578231292517007
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;EducationField&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 6,
+    &quot;unique_percentage&quot;: 0.40816326530612246,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Life Sciences&quot;,
+        &quot;frequency&quot;: 612,
+        &quot;frequency_percentage&quot;: 41.63265306122449
+      },
+      {
+        &quot;value&quot;: &quot;Medical&quot;,
+        &quot;frequency&quot;: 498,
+        &quot;frequency_percentage&quot;: 33.87755102040816
+      },
+      {
+        &quot;value&quot;: &quot;Marketing&quot;,
+        &quot;frequency&quot;: 169,
+        &quot;frequency_percentage&quot;: 11.496598639455783
+      },
+      {
+        &quot;value&quot;: &quot;Technical Degree&quot;,
+        &quot;frequency&quot;: 126,
+        &quot;frequency_percentage&quot;: 8.571428571428571
+      },
+      {
+        &quot;value&quot;: &quot;Other&quot;,
+        &quot;frequency&quot;: 40,
+        &quot;frequency_percentage&quot;: 2.7210884353741496
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>EmployeeCount</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;EmployeeCount&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 1.0,
+    &quot;mean&quot;: 1.0,
+    &quot;median&quot;: 1.0,
+    &quot;standard_deviation&quot;: 0.0,
+    &quot;variance&quot;: 0.0,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 1.0,
+      &quot;50%&quot;: 1.0,
+      &quot;75%&quot;: 1.0,
+      &quot;90%&quot;: 1.0,
+      &quot;95%&quot;: 1.0,
+      &quot;99%&quot;: 1.0
+    },
+    &quot;q1&quot;: 1.0,
+    &quot;q2&quot;: 1.0,
+    &quot;q3&quot;: 1.0,
+    &quot;iqr&quot;: 0.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 1.0,
+      &quot;upper_bound&quot;: 1.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;EmployeeCount&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 1.0,
+    &quot;mean&quot;: 1.0,
+    &quot;median&quot;: 1.0,
+    &quot;standard_deviation&quot;: 0.0,
+    &quot;variance&quot;: 0.0,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 1.0,
+      &quot;50%&quot;: 1.0,
+      &quot;75%&quot;: 1.0,
+      &quot;90%&quot;: 1.0,
+      &quot;95%&quot;: 1.0,
+      &quot;99%&quot;: 1.0
+    },
+    &quot;q1&quot;: 1.0,
+    &quot;q2&quot;: 1.0,
+    &quot;q3&quot;: 1.0,
+    &quot;iqr&quot;: 0.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 1.0,
+      &quot;upper_bound&quot;: 1.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>EmployeeNumber</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>2,068.00</td><td>2,068.00</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>1,024.87</td><td>1,052.79</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>601.8195</td><td>578.8424</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;EmployeeNumber&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 2068.0,
+    &quot;mean&quot;: 1024.865306122449,
+    &quot;median&quot;: 1020.5,
+    &quot;standard_deviation&quot;: 601.8195298288429,
+    &quot;variance&quot;: 362186.74648340954,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 19.689999999999998,
+      &quot;5%&quot;: 96.45,
+      &quot;10%&quot;: 198.9,
+      &quot;25%&quot;: 491.25,
+      &quot;50%&quot;: 1020.5,
+      &quot;75%&quot;: 1555.75,
+      &quot;90%&quot;: 1857.1,
+      &quot;95%&quot;: 1967.55,
+      &quot;99%&quot;: 2046.62
+    },
+    &quot;q1&quot;: 491.25,
+    &quot;q2&quot;: 1020.5,
+    &quot;q3&quot;: 1555.75,
+    &quot;iqr&quot;: 1064.5,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1105.5,
+      &quot;upper_bound&quot;: 3152.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;EmployeeNumber&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 2068.0,
+    &quot;mean&quot;: 1052.7897959183674,
+    &quot;median&quot;: 1083.5,
+    &quot;standard_deviation&quot;: 578.8423833772332,
+    &quot;variance&quot;: 335058.5047938358,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 124.75999999999999,
+      &quot;5%&quot;: 214.9,
+      &quot;10%&quot;: 292.9,
+      &quot;25%&quot;: 449.5,
+      &quot;50%&quot;: 1083.5,
+      &quot;75%&quot;: 1629.75,
+      &quot;90%&quot;: 1803.0,
+      &quot;95%&quot;: 1863.0,
+      &quot;99%&quot;: 1951.62
+    },
+    &quot;q1&quot;: 449.5,
+    &quot;q2&quot;: 1083.5,
+    &quot;q3&quot;: 1629.75,
+    &quot;iqr&quot;: 1180.25,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1320.875,
+      &quot;upper_bound&quot;: 3400.125
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>EnvironmentSatisfaction</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>4</td><td>4</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>2.7218</td><td>2.8293</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>1.0927</td><td>1.0704</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;EnvironmentSatisfaction&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 2.721768707482993,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 1.0927103547111139,
+    &quot;variance&quot;: 1.1940159192928883,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 4.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 4.0,
+    &quot;iqr&quot;: 2.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1.0,
+      &quot;upper_bound&quot;: 7.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;EnvironmentSatisfaction&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 2.829251700680272,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 1.0703620650285626,
+    &quot;variance&quot;: 1.145674950252209,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 4.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 4.0,
+    &quot;iqr&quot;: 2.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1.0,
+      &quot;upper_bound&quot;: 7.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>Gender</b> <span class="type">categorical</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Unique %</td><td>13.6054</td><td>13.6054</td><td class="status green">MATCH</td></tr><tr><td>Top value</td><td>Male</td><td>Male</td><td class="status ">—</td></tr><tr><td>Top frequency %</td><td>60</td><td>58.2313</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Gender&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 2,
+    &quot;unique_percentage&quot;: 0.13605442176870747,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Male&quot;,
+        &quot;frequency&quot;: 882,
+        &quot;frequency_percentage&quot;: 60.0
+      },
+      {
+        &quot;value&quot;: &quot;Female&quot;,
+        &quot;frequency&quot;: 588,
+        &quot;frequency_percentage&quot;: 40.0
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Gender&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 2,
+    &quot;unique_percentage&quot;: 0.13605442176870747,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Male&quot;,
+        &quot;frequency&quot;: 856,
+        &quot;frequency_percentage&quot;: 58.23129251700681
+      },
+      {
+        &quot;value&quot;: &quot;Female&quot;,
+        &quot;frequency&quot;: 614,
+        &quot;frequency_percentage&quot;: 41.76870748299319
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>HourlyRate</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>30</td><td>32</td><td class="status yellow">PARTIAL</td></tr><tr><td>Maximum</td><td>100</td><td>100</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>65.8912</td><td>66.349</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>20.3225</td><td>18.9062</td><td class="status yellow">PARTIAL</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;HourlyRate&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 30.0,
+    &quot;maximum&quot;: 100.0,
+    &quot;mean&quot;: 65.89115646258503,
+    &quot;median&quot;: 66.0,
+    &quot;standard_deviation&quot;: 20.32251164632403,
+    &quot;variance&quot;: 413.00447961497593,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 30.0,
+      &quot;5%&quot;: 33.0,
+      &quot;10%&quot;: 38.0,
+      &quot;25%&quot;: 48.0,
+      &quot;50%&quot;: 66.0,
+      &quot;75%&quot;: 83.75,
+      &quot;90%&quot;: 94.0,
+      &quot;95%&quot;: 97.0,
+      &quot;99%&quot;: 100.0
+    },
+    &quot;q1&quot;: 48.0,
+    &quot;q2&quot;: 66.0,
+    &quot;q3&quot;: 83.75,
+    &quot;iqr&quot;: 35.75,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -5.625,
+      &quot;upper_bound&quot;: 137.375
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;HourlyRate&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 32.0,
+    &quot;maximum&quot;: 100.0,
+    &quot;mean&quot;: 66.34897959183674,
+    &quot;median&quot;: 63.0,
+    &quot;standard_deviation&quot;: 18.906248714522008,
+    &quot;variance&quot;: 357.4462404553651,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 34.0,
+      &quot;5%&quot;: 38.0,
+      &quot;10%&quot;: 39.0,
+      &quot;25%&quot;: 53.0,
+      &quot;50%&quot;: 63.0,
+      &quot;75%&quot;: 83.0,
+      &quot;90%&quot;: 92.0,
+      &quot;95%&quot;: 94.0,
+      &quot;99%&quot;: 97.0
+    },
+    &quot;q1&quot;: 53.0,
+    &quot;q2&quot;: 63.0,
+    &quot;q3&quot;: 83.0,
+    &quot;iqr&quot;: 30.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 8.0,
+      &quot;upper_bound&quot;: 128.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>JobInvolvement</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>4</td><td>4</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>2.7299</td><td>2.6204</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>0.7113</td><td>0.7694</td><td class="status yellow">PARTIAL</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;JobInvolvement&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 2.7299319727891156,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 0.7113190741884202,
+    &quot;variance&quot;: 0.5059748253042713,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 2.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 3.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 1.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 0.5,
+      &quot;upper_bound&quot;: 4.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;JobInvolvement&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 2.620408163265306,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 0.7693922661770716,
+    &quot;variance&quot;: 0.5919644592530897,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.4500000000000028,
+      &quot;10%&quot;: 2.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 1.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 0.5,
+      &quot;upper_bound&quot;: 4.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>JobLevel</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>5</td><td>5</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>2.0639</td><td>2.1177</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>1.1066</td><td>1.1578</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;JobLevel&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 5.0,
+    &quot;mean&quot;: 2.0639455782312925,
+    &quot;median&quot;: 2.0,
+    &quot;standard_deviation&quot;: 1.1065633247112856,
+    &quot;variance&quot;: 1.2244823915960943,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 1.0,
+      &quot;50%&quot;: 2.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 5.0
+    },
+    &quot;q1&quot;: 1.0,
+    &quot;q2&quot;: 2.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 2.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -2.0,
+      &quot;upper_bound&quot;: 6.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;JobLevel&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 5.0,
+    &quot;mean&quot;: 2.117687074829932,
+    &quot;median&quot;: 2.0,
+    &quot;standard_deviation&quot;: 1.157830523490142,
+    &quot;variance&quot;: 1.3405715211254563,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 1.0,
+      &quot;50%&quot;: 2.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 5.0,
+      &quot;99%&quot;: 5.0
+    },
+    &quot;q1&quot;: 1.0,
+    &quot;q2&quot;: 2.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 2.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -2.0,
+      &quot;upper_bound&quot;: 6.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>JobRole</b> <span class="type">categorical</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Unique %</td><td>61.2245</td><td>61.2245</td><td class="status green">MATCH</td></tr><tr><td>Top value</td><td>Sales Executive</td><td>Sales Executive</td><td class="status ">—</td></tr><tr><td>Top frequency %</td><td>22.1769</td><td>23.6054</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;JobRole&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 9,
+    &quot;unique_percentage&quot;: 0.6122448979591837,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Sales Executive&quot;,
+        &quot;frequency&quot;: 326,
+        &quot;frequency_percentage&quot;: 22.176870748299322
+      },
+      {
+        &quot;value&quot;: &quot;Research Scientist&quot;,
+        &quot;frequency&quot;: 292,
+        &quot;frequency_percentage&quot;: 19.86394557823129
+      },
+      {
+        &quot;value&quot;: &quot;Laboratory Technician&quot;,
+        &quot;frequency&quot;: 259,
+        &quot;frequency_percentage&quot;: 17.61904761904762
+      },
+      {
+        &quot;value&quot;: &quot;Manufacturing Director&quot;,
+        &quot;frequency&quot;: 145,
+        &quot;frequency_percentage&quot;: 9.863945578231291
+      },
+      {
+        &quot;value&quot;: &quot;Healthcare Representative&quot;,
+        &quot;frequency&quot;: 131,
+        &quot;frequency_percentage&quot;: 8.91156462585034
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;JobRole&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 9,
+    &quot;unique_percentage&quot;: 0.6122448979591837,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Sales Executive&quot;,
+        &quot;frequency&quot;: 347,
+        &quot;frequency_percentage&quot;: 23.605442176870746
+      },
+      {
+        &quot;value&quot;: &quot;Research Scientist&quot;,
+        &quot;frequency&quot;: 336,
+        &quot;frequency_percentage&quot;: 22.857142857142858
+      },
+      {
+        &quot;value&quot;: &quot;Laboratory Technician&quot;,
+        &quot;frequency&quot;: 261,
+        &quot;frequency_percentage&quot;: 17.755102040816325
+      },
+      {
+        &quot;value&quot;: &quot;Manager&quot;,
+        &quot;frequency&quot;: 145,
+        &quot;frequency_percentage&quot;: 9.863945578231291
+      },
+      {
+        &quot;value&quot;: &quot;Manufacturing Director&quot;,
+        &quot;frequency&quot;: 126,
+        &quot;frequency_percentage&quot;: 8.571428571428571
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>JobSatisfaction</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>4</td><td>4</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>2.7286</td><td>2.8408</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>1.1025</td><td>1.1299</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;JobSatisfaction&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 2.7285714285714286,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 1.10247094150855,
+    &quot;variance&quot;: 1.2154421768707486,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 4.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 4.0,
+    &quot;iqr&quot;: 2.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1.0,
+      &quot;upper_bound&quot;: 7.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;JobSatisfaction&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 2.840816326530612,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 1.129912109160408,
+    &quot;variance&quot;: 1.2767013744273221,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 4.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 4.0,
+    &quot;iqr&quot;: 2.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1.0,
+      &quot;upper_bound&quot;: 7.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>MaritalStatus</b> <span class="type">categorical</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Unique %</td><td>20.4082</td><td>20.4082</td><td class="status green">MATCH</td></tr><tr><td>Top value</td><td>Married</td><td>Married</td><td class="status ">—</td></tr><tr><td>Top frequency %</td><td>45.7823</td><td>42.7891</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;MaritalStatus&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 3,
+    &quot;unique_percentage&quot;: 0.20408163265306123,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Married&quot;,
+        &quot;frequency&quot;: 673,
+        &quot;frequency_percentage&quot;: 45.78231292517007
+      },
+      {
+        &quot;value&quot;: &quot;Single&quot;,
+        &quot;frequency&quot;: 470,
+        &quot;frequency_percentage&quot;: 31.97278911564626
+      },
+      {
+        &quot;value&quot;: &quot;Divorced&quot;,
+        &quot;frequency&quot;: 327,
+        &quot;frequency_percentage&quot;: 22.244897959183675
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;MaritalStatus&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 3,
+    &quot;unique_percentage&quot;: 0.20408163265306123,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Married&quot;,
+        &quot;frequency&quot;: 629,
+        &quot;frequency_percentage&quot;: 42.7891156462585
+      },
+      {
+        &quot;value&quot;: &quot;Single&quot;,
+        &quot;frequency&quot;: 488,
+        &quot;frequency_percentage&quot;: 33.197278911564624
+      },
+      {
+        &quot;value&quot;: &quot;Divorced&quot;,
+        &quot;frequency&quot;: 353,
+        &quot;frequency_percentage&quot;: 24.01360544217687
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>MonthlyIncome</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1,009.00</td><td>1,009.00</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>19,999.00</td><td>19,141.00</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>6,502.93</td><td>5,985.60</td><td class="status yellow">PARTIAL</td></tr><tr><td>Std Dev</td><td>4,706.36</td><td>4,780.64</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;MonthlyIncome&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1009.0,
+    &quot;maximum&quot;: 19999.0,
+    &quot;mean&quot;: 6502.931292517007,
+    &quot;median&quot;: 4919.0,
+    &quot;standard_deviation&quot;: 4706.355164823002,
+    &quot;variance&quot;: 22149778.937456146,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1382.46,
+      &quot;5%&quot;: 2097.9,
+      &quot;10%&quot;: 2317.6,
+      &quot;25%&quot;: 2911.0,
+      &quot;50%&quot;: 4919.0,
+      &quot;75%&quot;: 8379.0,
+      &quot;90%&quot;: 13775.599999999995,
+      &quot;95%&quot;: 17821.349999999995,
+      &quot;99%&quot;: 19626.31
+    },
+    &quot;q1&quot;: 2911.0,
+    &quot;q2&quot;: 4919.0,
+    &quot;q3&quot;: 8379.0,
+    &quot;iqr&quot;: 5468.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 114,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -5291.0,
+      &quot;upper_bound&quot;: 16581.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;MonthlyIncome&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1009.0,
+    &quot;maximum&quot;: 19141.0,
+    &quot;mean&quot;: 5985.599319727891,
+    &quot;median&quot;: 4278.5,
+    &quot;standard_deviation&quot;: 4780.636253658654,
+    &quot;variance&quot;: 22854482.989795454,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1261.38,
+      &quot;5%&quot;: 1580.45,
+      &quot;10%&quot;: 1812.9,
+      &quot;25%&quot;: 2330.0,
+      &quot;50%&quot;: 4278.5,
+      &quot;75%&quot;: 8270.25,
+      &quot;90%&quot;: 15717.899999999998,
+      &quot;95%&quot;: 16861.2,
+      &quot;99%&quot;: 18062.75
+    },
+    &quot;q1&quot;: 2330.0,
+    &quot;q2&quot;: 4278.5,
+    &quot;q3&quot;: 8270.25,
+    &quot;iqr&quot;: 5940.25,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 51,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -6580.375,
+      &quot;upper_bound&quot;: 17180.625
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>MonthlyRate</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>2,094.00</td><td>2,211.00</td><td class="status yellow">PARTIAL</td></tr><tr><td>Maximum</td><td>26,999.00</td><td>26,999.00</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>14,313.10</td><td>14,493.06</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>7,115.36</td><td>6,686.40</td><td class="status yellow">PARTIAL</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;MonthlyRate&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 2094.0,
+    &quot;maximum&quot;: 26999.0,
+    &quot;mean&quot;: 14313.103401360544,
+    &quot;median&quot;: 14235.5,
+    &quot;standard_deviation&quot;: 7115.364616521268,
+    &quot;variance&quot;: 50628413.62604284,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 2325.07,
+      &quot;5%&quot;: 3384.55,
+      &quot;10%&quot;: 4603.0,
+      &quot;25%&quot;: 8047.0,
+      &quot;50%&quot;: 14235.5,
+      &quot;75%&quot;: 20461.5,
+      &quot;90%&quot;: 24001.7,
+      &quot;95%&quot;: 25431.899999999998,
+      &quot;99%&quot;: 26704.239999999998
+    },
+    &quot;q1&quot;: 8047.0,
+    &quot;q2&quot;: 14235.5,
+    &quot;q3&quot;: 20461.5,
+    &quot;iqr&quot;: 12414.5,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -10574.75,
+      &quot;upper_bound&quot;: 39083.25
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;MonthlyRate&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 2211.0,
+    &quot;maximum&quot;: 26999.0,
+    &quot;mean&quot;: 14493.061224489797,
+    &quot;median&quot;: 14137.5,
+    &quot;standard_deviation&quot;: 6686.398030385369,
+    &quot;variance&quot;: 44707918.62074134,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 3575.52,
+      &quot;5%&quot;: 4494.45,
+      &quot;10%&quot;: 5246.0,
+      &quot;25%&quot;: 9218.25,
+      &quot;50%&quot;: 14137.5,
+      &quot;75%&quot;: 20816.0,
+      &quot;90%&quot;: 23543.5,
+      &quot;95%&quot;: 24300.5,
+      &quot;99%&quot;: 25419.239999999998
+    },
+    &quot;q1&quot;: 9218.25,
+    &quot;q2&quot;: 14137.5,
+    &quot;q3&quot;: 20816.0,
+    &quot;iqr&quot;: 11597.75,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -8178.375,
+      &quot;upper_bound&quot;: 38212.625
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>NumCompaniesWorked</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>9</td><td>9</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>2.6932</td><td>2.6803</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>2.4972</td><td>2.5386</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;NumCompaniesWorked&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 9.0,
+    &quot;mean&quot;: 2.6931972789115646,
+    &quot;median&quot;: 2.0,
+    &quot;standard_deviation&quot;: 2.4971591985938435,
+    &quot;variance&quot;: 6.235804063121847,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 0.0,
+      &quot;25%&quot;: 1.0,
+      &quot;50%&quot;: 2.0,
+      &quot;75%&quot;: 4.0,
+      &quot;90%&quot;: 7.0,
+      &quot;95%&quot;: 8.0,
+      &quot;99%&quot;: 9.0
+    },
+    &quot;q1&quot;: 1.0,
+    &quot;q2&quot;: 2.0,
+    &quot;q3&quot;: 4.0,
+    &quot;iqr&quot;: 3.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 52,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -3.5,
+      &quot;upper_bound&quot;: 8.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;NumCompaniesWorked&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 9.0,
+    &quot;mean&quot;: 2.6802721088435373,
+    &quot;median&quot;: 2.0,
+    &quot;standard_deviation&quot;: 2.5386439000235628,
+    &quot;variance&quot;: 6.444712851126845,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 0.0,
+      &quot;25%&quot;: 1.0,
+      &quot;50%&quot;: 2.0,
+      &quot;75%&quot;: 4.0,
+      &quot;90%&quot;: 7.0,
+      &quot;95%&quot;: 8.0,
+      &quot;99%&quot;: 9.0
+    },
+    &quot;q1&quot;: 1.0,
+    &quot;q2&quot;: 2.0,
+    &quot;q3&quot;: 4.0,
+    &quot;iqr&quot;: 3.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 62,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -3.5,
+      &quot;upper_bound&quot;: 8.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>Over18</b> <span class="type">categorical</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Unique %</td><td>6.8027</td><td>6.8027</td><td class="status green">MATCH</td></tr><tr><td>Top value</td><td>Y</td><td>Y</td><td class="status ">—</td></tr><tr><td>Top frequency %</td><td>100</td><td>100</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Over18&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 1,
+    &quot;unique_percentage&quot;: 0.06802721088435373,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Y&quot;,
+        &quot;frequency&quot;: 1470,
+        &quot;frequency_percentage&quot;: 100.0
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;Over18&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 1,
+    &quot;unique_percentage&quot;: 0.06802721088435373,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;Y&quot;,
+        &quot;frequency&quot;: 1470,
+        &quot;frequency_percentage&quot;: 100.0
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>OverTime</b> <span class="type">categorical</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Unique %</td><td>13.6054</td><td>13.6054</td><td class="status green">MATCH</td></tr><tr><td>Top value</td><td>No</td><td>No</td><td class="status ">—</td></tr><tr><td>Top frequency %</td><td>71.7007</td><td>66.5986</td><td class="status yellow">PARTIAL</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;OverTime&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 2,
+    &quot;unique_percentage&quot;: 0.13605442176870747,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;No&quot;,
+        &quot;frequency&quot;: 1054,
+        &quot;frequency_percentage&quot;: 71.70068027210884
+      },
+      {
+        &quot;value&quot;: &quot;Yes&quot;,
+        &quot;frequency&quot;: 416,
+        &quot;frequency_percentage&quot;: 28.29931972789116
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;OverTime&quot;,
+  &quot;pandas_dtype&quot;: &quot;str&quot;,
+  &quot;semantic_type&quot;: &quot;categorical&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;categorical&quot;: {
+    &quot;unique_values&quot;: 2,
+    &quot;unique_percentage&quot;: 0.13605442176870747,
+    &quot;most_frequent_values&quot;: [
+      {
+        &quot;value&quot;: &quot;No&quot;,
+        &quot;frequency&quot;: 979,
+        &quot;frequency_percentage&quot;: 66.59863945578232
+      },
+      {
+        &quot;value&quot;: &quot;Yes&quot;,
+        &quot;frequency&quot;: 491,
+        &quot;frequency_percentage&quot;: 33.40136054421769
+      }
+    ],
+    &quot;high_cardinality&quot;: false,
+    &quot;unique_count_note&quot;: &quot;Exact while below the tracking limit; bounded when high-cardinality.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>PercentSalaryHike</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>11</td><td>11</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>25</td><td>25</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>15.2095</td><td>14.0571</td><td class="status yellow">PARTIAL</td></tr><tr><td>Std Dev</td><td>3.6587</td><td>3.4738</td><td class="status yellow">PARTIAL</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;PercentSalaryHike&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 11.0,
+    &quot;maximum&quot;: 25.0,
+    &quot;mean&quot;: 15.209523809523809,
+    &quot;median&quot;: 14.0,
+    &quot;standard_deviation&quot;: 3.6586926279795304,
+    &quot;variance&quot;: 13.386031746031762,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 11.0,
+      &quot;5%&quot;: 11.0,
+      &quot;10%&quot;: 11.0,
+      &quot;25%&quot;: 12.0,
+      &quot;50%&quot;: 14.0,
+      &quot;75%&quot;: 18.0,
+      &quot;90%&quot;: 21.0,
+      &quot;95%&quot;: 22.0,
+      &quot;99%&quot;: 25.0
+    },
+    &quot;q1&quot;: 12.0,
+    &quot;q2&quot;: 14.0,
+    &quot;q3&quot;: 18.0,
+    &quot;iqr&quot;: 6.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 3.0,
+      &quot;upper_bound&quot;: 27.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;PercentSalaryHike&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 11.0,
+    &quot;maximum&quot;: 25.0,
+    &quot;mean&quot;: 14.057142857142857,
+    &quot;median&quot;: 13.0,
+    &quot;standard_deviation&quot;: 3.4738282906898696,
+    &quot;variance&quot;: 12.067482993197302,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 11.0,
+      &quot;5%&quot;: 11.0,
+      &quot;10%&quot;: 11.0,
+      &quot;25%&quot;: 11.0,
+      &quot;50%&quot;: 13.0,
+      &quot;75%&quot;: 16.0,
+      &quot;90%&quot;: 20.0,
+      &quot;95%&quot;: 21.0,
+      &quot;99%&quot;: 23.0
+    },
+    &quot;q1&quot;: 11.0,
+    &quot;q2&quot;: 13.0,
+    &quot;q3&quot;: 16.0,
+    &quot;iqr&quot;: 5.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 4,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 3.5,
+      &quot;upper_bound&quot;: 23.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>PerformanceRating</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>3</td><td>3</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>4</td><td>4</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>3.1537</td><td>3.1517</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>0.3607</td><td>0.3587</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;PerformanceRating&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 3.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 3.1537414965986397,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 0.360700774634943,
+    &quot;variance&quot;: 0.13010504882224794,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 3.0,
+      &quot;5%&quot;: 3.0,
+      &quot;10%&quot;: 3.0,
+      &quot;25%&quot;: 3.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 3.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 0.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 226,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 3.0,
+      &quot;upper_bound&quot;: 3.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;PerformanceRating&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 3.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 3.151700680272109,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 0.3587305170696915,
+    &quot;variance&quot;: 0.12868758387708823,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 3.0,
+      &quot;5%&quot;: 3.0,
+      &quot;10%&quot;: 3.0,
+      &quot;25%&quot;: 3.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 3.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 0.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 223,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 3.0,
+      &quot;upper_bound&quot;: 3.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>RelationshipSatisfaction</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>4</td><td>4</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>2.7122</td><td>2.8333</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>1.0808</td><td>0.9448</td><td class="status red">MISMATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;RelationshipSatisfaction&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 2.7122448979591836,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 1.0808410657505316,
+    &quot;variance&quot;: 1.1682174094127449,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 4.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 4.0,
+    &quot;iqr&quot;: 2.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1.0,
+      &quot;upper_bound&quot;: 7.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;RelationshipSatisfaction&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 2.8333333333333335,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 0.9447911861821779,
+    &quot;variance&quot;: 0.8926303854875268,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 4.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 4.0,
+    &quot;iqr&quot;: 2.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1.0,
+      &quot;upper_bound&quot;: 7.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>StandardHours</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>80</td><td>80</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>80</td><td>80</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>80</td><td>80</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;StandardHours&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 80.0,
+    &quot;maximum&quot;: 80.0,
+    &quot;mean&quot;: 80.0,
+    &quot;median&quot;: 80.0,
+    &quot;standard_deviation&quot;: 0.0,
+    &quot;variance&quot;: 0.0,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 80.0,
+      &quot;5%&quot;: 80.0,
+      &quot;10%&quot;: 80.0,
+      &quot;25%&quot;: 80.0,
+      &quot;50%&quot;: 80.0,
+      &quot;75%&quot;: 80.0,
+      &quot;90%&quot;: 80.0,
+      &quot;95%&quot;: 80.0,
+      &quot;99%&quot;: 80.0
+    },
+    &quot;q1&quot;: 80.0,
+    &quot;q2&quot;: 80.0,
+    &quot;q3&quot;: 80.0,
+    &quot;iqr&quot;: 0.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 80.0,
+      &quot;upper_bound&quot;: 80.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;StandardHours&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 80.0,
+    &quot;maximum&quot;: 80.0,
+    &quot;mean&quot;: 80.0,
+    &quot;median&quot;: 80.0,
+    &quot;standard_deviation&quot;: 0.0,
+    &quot;variance&quot;: 0.0,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 80.0,
+      &quot;5%&quot;: 80.0,
+      &quot;10%&quot;: 80.0,
+      &quot;25%&quot;: 80.0,
+      &quot;50%&quot;: 80.0,
+      &quot;75%&quot;: 80.0,
+      &quot;90%&quot;: 80.0,
+      &quot;95%&quot;: 80.0,
+      &quot;99%&quot;: 80.0
+    },
+    &quot;q1&quot;: 80.0,
+    &quot;q2&quot;: 80.0,
+    &quot;q3&quot;: 80.0,
+    &quot;iqr&quot;: 0.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 80.0,
+      &quot;upper_bound&quot;: 80.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>StockOptionLevel</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>3</td><td>3</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>0.7939</td><td>0.7667</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>0.8518</td><td>0.8543</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;StockOptionLevel&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 3.0,
+    &quot;mean&quot;: 0.7938775510204081,
+    &quot;median&quot;: 1.0,
+    &quot;standard_deviation&quot;: 0.8517867966287158,
+    &quot;variance&quot;: 0.7255407469110093,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 0.0,
+      &quot;25%&quot;: 0.0,
+      &quot;50%&quot;: 1.0,
+      &quot;75%&quot;: 1.0,
+      &quot;90%&quot;: 2.0,
+      &quot;95%&quot;: 3.0,
+      &quot;99%&quot;: 3.0
+    },
+    &quot;q1&quot;: 0.0,
+    &quot;q2&quot;: 1.0,
+    &quot;q3&quot;: 1.0,
+    &quot;iqr&quot;: 1.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 85,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1.5,
+      &quot;upper_bound&quot;: 2.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;StockOptionLevel&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 3.0,
+    &quot;mean&quot;: 0.7666666666666667,
+    &quot;median&quot;: 1.0,
+    &quot;standard_deviation&quot;: 0.8543472929974989,
+    &quot;variance&quot;: 0.7299092970521542,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 0.0,
+      &quot;25%&quot;: 0.0,
+      &quot;50%&quot;: 1.0,
+      &quot;75%&quot;: 1.0,
+      &quot;90%&quot;: 2.0,
+      &quot;95%&quot;: 3.0,
+      &quot;99%&quot;: 3.0
+    },
+    &quot;q1&quot;: 0.0,
+    &quot;q2&quot;: 1.0,
+    &quot;q3&quot;: 1.0,
+    &quot;iqr&quot;: 1.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 91,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -1.5,
+      &quot;upper_bound&quot;: 2.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>TotalWorkingYears</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>40</td><td>40</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>11.2796</td><td>14.7898</td><td class="status red">MISMATCH</td></tr><tr><td>Std Dev</td><td>7.7781</td><td>9.8658</td><td class="status red">MISMATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;TotalWorkingYears&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 40.0,
+    &quot;mean&quot;: 11.279591836734694,
+    &quot;median&quot;: 10.0,
+    &quot;standard_deviation&quot;: 7.778134700893234,
+    &quot;variance&quot;: 60.49937942523948,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 3.0,
+      &quot;25%&quot;: 6.0,
+      &quot;50%&quot;: 10.0,
+      &quot;75%&quot;: 15.0,
+      &quot;90%&quot;: 23.0,
+      &quot;95%&quot;: 28.0,
+      &quot;99%&quot;: 35.0
+    },
+    &quot;q1&quot;: 6.0,
+    &quot;q2&quot;: 10.0,
+    &quot;q3&quot;: 15.0,
+    &quot;iqr&quot;: 9.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 63,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -7.5,
+      &quot;upper_bound&quot;: 28.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;TotalWorkingYears&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 40.0,
+    &quot;mean&quot;: 14.789795918367346,
+    &quot;median&quot;: 10.0,
+    &quot;standard_deviation&quot;: 9.865767342912214,
+    &quot;variance&quot;: 97.33336526447314,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 2.0,
+      &quot;5%&quot;: 4.0,
+      &quot;10%&quot;: 5.0,
+      &quot;25%&quot;: 8.0,
+      &quot;50%&quot;: 10.0,
+      &quot;75%&quot;: 20.0,
+      &quot;90%&quot;: 32.0,
+      &quot;95%&quot;: 37.0,
+      &quot;99%&quot;: 40.0
+    },
+    &quot;q1&quot;: 8.0,
+    &quot;q2&quot;: 10.0,
+    &quot;q3&quot;: 20.0,
+    &quot;iqr&quot;: 12.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 52,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -10.0,
+      &quot;upper_bound&quot;: 38.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>TrainingTimesLastYear</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>6</td><td>6</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>2.7993</td><td>2.619</td><td class="status yellow">PARTIAL</td></tr><tr><td>Std Dev</td><td>1.2888</td><td>1.1948</td><td class="status yellow">PARTIAL</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;TrainingTimesLastYear&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 6.0,
+    &quot;mean&quot;: 2.7993197278911564,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 1.2888320187689348,
+    &quot;variance&quot;: 1.6610879726040082,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 2.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 5.0,
+      &quot;95%&quot;: 5.0,
+      &quot;99%&quot;: 6.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 1.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 238,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 0.5,
+      &quot;upper_bound&quot;: 4.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;TrainingTimesLastYear&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 6.0,
+    &quot;mean&quot;: 2.619047619047619,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 1.19484911143331,
+    &quot;variance&quot;: 1.4276643990929703,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 5.0,
+      &quot;99%&quot;: 6.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 1.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 192,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 0.5,
+      &quot;upper_bound&quot;: 4.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>WorkLifeBalance</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>1</td><td>1</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>4</td><td>4</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>2.7612</td><td>2.732</td><td class="status green">MATCH</td></tr><tr><td>Std Dev</td><td>0.7062</td><td>0.7173</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;WorkLifeBalance&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 2.7612244897959184,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 0.7062354909319911,
+    &quot;variance&quot;: 0.4987685686519505,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 2.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 1.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 0.5,
+      &quot;upper_bound&quot;: 4.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;WorkLifeBalance&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 1.0,
+    &quot;maximum&quot;: 4.0,
+    &quot;mean&quot;: 2.7319727891156464,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 0.7173255690749375,
+    &quot;variance&quot;: 0.514555972048683,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 1.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 2.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 4.0,
+      &quot;95%&quot;: 4.0,
+      &quot;99%&quot;: 4.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 1.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 0,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: 0.5,
+      &quot;upper_bound&quot;: 4.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>YearsAtCompany</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>40</td><td>40</td><td class="status green">MATCH</td></tr><tr><td>Mean</td><td>7.0082</td><td>7.6497</td><td class="status yellow">PARTIAL</td></tr><tr><td>Std Dev</td><td>6.1244</td><td>7.2603</td><td class="status red">MISMATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;YearsAtCompany&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 40.0,
+    &quot;mean&quot;: 7.0081632653061225,
+    &quot;median&quot;: 5.0,
+    &quot;standard_deviation&quot;: 6.124440945793706,
+    &quot;variance&quot;: 37.508776898514505,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 3.0,
+      &quot;50%&quot;: 5.0,
+      &quot;75%&quot;: 9.0,
+      &quot;90%&quot;: 15.0,
+      &quot;95%&quot;: 20.0,
+      &quot;99%&quot;: 31.0
+    },
+    &quot;q1&quot;: 3.0,
+    &quot;q2&quot;: 5.0,
+    &quot;q3&quot;: 9.0,
+    &quot;iqr&quot;: 6.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 104,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -6.0,
+      &quot;upper_bound&quot;: 18.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;YearsAtCompany&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 40.0,
+    &quot;mean&quot;: 7.649659863945578,
+    &quot;median&quot;: 5.0,
+    &quot;standard_deviation&quot;: 7.260299970842829,
+    &quot;variance&quot;: 52.71195566662039,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 1.0,
+      &quot;10%&quot;: 1.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 5.0,
+      &quot;75%&quot;: 10.0,
+      &quot;90%&quot;: 20.0,
+      &quot;95%&quot;: 23.0,
+      &quot;99%&quot;: 33.309999999999945
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 5.0,
+    &quot;q3&quot;: 10.0,
+    &quot;iqr&quot;: 8.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 79,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -10.0,
+      &quot;upper_bound&quot;: 22.0
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>YearsInCurrentRole</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>18</td><td>16</td><td class="status red">MISMATCH</td></tr><tr><td>Mean</td><td>4.2293</td><td>3.4204</td><td class="status red">MISMATCH</td></tr><tr><td>Std Dev</td><td>3.6219</td><td>3.2593</td><td class="status red">MISMATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;YearsInCurrentRole&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 18.0,
+    &quot;mean&quot;: 4.229251700680272,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 3.6219044654787536,
+    &quot;variance&quot;: 13.118191957054936,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 0.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 7.0,
+      &quot;90%&quot;: 9.0,
+      &quot;95%&quot;: 11.0,
+      &quot;99%&quot;: 15.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 7.0,
+    &quot;iqr&quot;: 5.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 21,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -5.5,
+      &quot;upper_bound&quot;: 14.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;YearsInCurrentRole&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 16.0,
+    &quot;mean&quot;: 3.4204081632653063,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 3.2593338239983782,
+    &quot;variance&quot;: 10.62325697625989,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 0.0,
+      &quot;25%&quot;: 1.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 6.0,
+      &quot;90%&quot;: 8.0,
+      &quot;95%&quot;: 9.0,
+      &quot;99%&quot;: 12.309999999999945
+    },
+    &quot;q1&quot;: 1.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 6.0,
+    &quot;iqr&quot;: 5.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 5,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -6.5,
+      &quot;upper_bound&quot;: 13.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>YearsSinceLastPromotion</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>15</td><td>14</td><td class="status yellow">PARTIAL</td></tr><tr><td>Mean</td><td>2.1878</td><td>2.0279</td><td class="status yellow">PARTIAL</td></tr><tr><td>Std Dev</td><td>3.2213</td><td>3.2784</td><td class="status green">MATCH</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;YearsSinceLastPromotion&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 15.0,
+    &quot;mean&quot;: 2.1877551020408164,
+    &quot;median&quot;: 1.0,
+    &quot;standard_deviation&quot;: 3.2213340279481772,
+    &quot;variance&quot;: 10.376992919616827,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 0.0,
+      &quot;25%&quot;: 0.0,
+      &quot;50%&quot;: 1.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 7.0,
+      &quot;95%&quot;: 9.0,
+      &quot;99%&quot;: 14.0
+    },
+    &quot;q1&quot;: 0.0,
+    &quot;q2&quot;: 1.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 3.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 107,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -4.5,
+      &quot;upper_bound&quot;: 7.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;YearsSinceLastPromotion&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 14.0,
+    &quot;mean&quot;: 2.027891156462585,
+    &quot;median&quot;: 0.0,
+    &quot;standard_deviation&quot;: 3.2784450087240926,
+    &quot;variance&quot;: 10.748201675227914,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 0.0,
+      &quot;25%&quot;: 0.0,
+      &quot;50%&quot;: 0.0,
+      &quot;75%&quot;: 3.0,
+      &quot;90%&quot;: 7.0,
+      &quot;95%&quot;: 10.0,
+      &quot;99%&quot;: 12.0
+    },
+    &quot;q1&quot;: 0.0,
+    &quot;q2&quot;: 0.0,
+    &quot;q3&quot;: 3.0,
+    &quot;iqr&quot;: 3.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 140,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -4.5,
+      &quot;upper_bound&quot;: 7.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details><details class="profile-card"><summary><b>YearsWithCurrManager</b> <span class="type">numeric</span></summary>
+    <table class="mini"><thead><tr><th>Metric</th><th>Actual</th><th>Synthetic</th><th>Status</th></tr></thead><tbody><tr><td>Null %</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Minimum</td><td>0</td><td>0</td><td class="status green">MATCH</td></tr><tr><td>Maximum</td><td>17</td><td>16</td><td class="status yellow">PARTIAL</td></tr><tr><td>Mean</td><td>4.1231</td><td>3.3299</td><td class="status red">MISMATCH</td></tr><tr><td>Std Dev</td><td>3.5669</td><td>3.2648</td><td class="status yellow">PARTIAL</td></tr></tbody></table>
+    <div class="json-grid"><div><h4>Actual profile</h4><pre>{
+  &quot;column_name&quot;: &quot;YearsWithCurrManager&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 17.0,
+    &quot;mean&quot;: 4.12312925170068,
+    &quot;median&quot;: 3.0,
+    &quot;standard_deviation&quot;: 3.566922262325164,
+    &quot;variance&quot;: 12.722934425470868,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 0.0,
+      &quot;25%&quot;: 2.0,
+      &quot;50%&quot;: 3.0,
+      &quot;75%&quot;: 7.0,
+      &quot;90%&quot;: 9.0,
+      &quot;95%&quot;: 10.0,
+      &quot;99%&quot;: 14.0
+    },
+    &quot;q1&quot;: 2.0,
+    &quot;q2&quot;: 3.0,
+    &quot;q3&quot;: 7.0,
+    &quot;iqr&quot;: 5.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 14,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -5.5,
+      &quot;upper_bound&quot;: 14.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div><div><h4>Synthetic profile</h4><pre>{
+  &quot;column_name&quot;: &quot;YearsWithCurrManager&quot;,
+  &quot;pandas_dtype&quot;: &quot;int64&quot;,
+  &quot;semantic_type&quot;: &quot;numeric&quot;,
+  &quot;null_count&quot;: 0,
+  &quot;null_percentage&quot;: 0.0,
+  &quot;statistics&quot;: {
+    &quot;minimum&quot;: 0.0,
+    &quot;maximum&quot;: 16.0,
+    &quot;mean&quot;: 3.3299319727891157,
+    &quot;median&quot;: 2.0,
+    &quot;standard_deviation&quot;: 3.264838756235265,
+    &quot;variance&quot;: 10.659172104215834,
+    &quot;quantiles&quot;: {
+      &quot;1%&quot;: 0.0,
+      &quot;5%&quot;: 0.0,
+      &quot;10%&quot;: 0.0,
+      &quot;25%&quot;: 1.0,
+      &quot;50%&quot;: 2.0,
+      &quot;75%&quot;: 6.0,
+      &quot;90%&quot;: 7.099999999999909,
+      &quot;95%&quot;: 10.0,
+      &quot;99%&quot;: 12.0
+    },
+    &quot;q1&quot;: 1.0,
+    &quot;q2&quot;: 2.0,
+    &quot;q3&quot;: 6.0,
+    &quot;iqr&quot;: 5.0,
+    &quot;outliers&quot;: {
+      &quot;count&quot;: 5,
+      &quot;method&quot;: &quot;IQR&quot;,
+      &quot;lower_bound&quot;: -6.5,
+      &quot;upper_bound&quot;: 13.5
+    },
+    &quot;quantiles_note&quot;: &quot;Exact quantiles calculated from all numeric values using disk-backed external sorting. No reservoir sampling is used.&quot;
+  }
+}</pre></div></div></details>
+<h2>5. Fidelity Analysis</h2><div class="grid"><div class="card"><div class="small">Average KS statistic — numerical</div><div class="metric">0.0801</div><div class="small">Median: 0.0636; 9/26 have p ≥ 0.05</div></div><div class="card"><div class="small">Average TVD — categorical</div><div class="metric">0.0420</div><div class="small">Median: 0.0340; 4/9 have χ² p ≥ 0.05</div></div><div class="card"><div class="small">Missing values</div><div class="metric">0 → 0</div><div class="small">Both datasets contain no missing values</div></div><div class="card"><div class="small">Duplicates</div><div class="metric">0 → 0</div><div class="small">No exact duplicate rows in either file</div></div></div>
+<div class="table-wrap"><table style="min-width:1050px"><thead><tr><th>Column</th><th>Type</th><th>Fidelity metric</th><th>p-value</th><th>Statistical view</th><th>Human-readable observation</th></tr></thead><tbody><tr><td>Age</td><td>Numerical</td><td>KS = 0.0959</td><td>2.6326e-06</td><td class="status red">DIFFERENT</td><td>Moderate difference</td></tr><tr><td>Attrition</td><td>Categorical</td><td>χ² = 41.3609; TVD = 0.0973</td><td>1.26566e-10</td><td class="status red">DIFFERENT</td><td>Large category-distribution difference</td></tr><tr><td>BusinessTravel</td><td>Categorical</td><td>χ² = 16.4829; TVD = 0.0619</td><td>0.000263497</td><td class="status red">DIFFERENT</td><td>Large category-distribution difference</td></tr><tr><td>DailyRate</td><td>Numerical</td><td>KS = 0.1136</td><td>1.11315e-08</td><td class="status red">DIFFERENT</td><td>Noticeable distribution difference</td></tr><tr><td>Department</td><td>Categorical</td><td>χ² = 0.4736; TVD = 0.0095</td><td>0.789134</td><td class="status green">NOT REJECTED</td><td>Small category-distribution difference</td></tr><tr><td>DistanceFromHome</td><td>Numerical</td><td>KS = 0.0605</td><td>0.00912489</td><td class="status red">DIFFERENT</td><td>Moderate difference</td></tr><tr><td>Education</td><td>Numerical</td><td>KS = 0.0667</td><td>0.00290069</td><td class="status red">DIFFERENT</td><td>Moderate difference</td></tr><tr><td>EducationField</td><td>Categorical</td><td>χ² = 16.2116; TVD = 0.0340</td><td>0.00626528</td><td class="status red">DIFFERENT</td><td>Moderate category-distribution difference</td></tr><tr><td>EmployeeCount</td><td>Numerical</td><td>KS = 0.0000</td><td>1</td><td class="status green">NOT REJECTED</td><td>Very close distribution</td></tr><tr><td>EmployeeNumber</td><td>Numerical</td><td>KS = 0.0653</td><td>0.00377797</td><td class="status red">DIFFERENT</td><td>Moderate difference</td></tr><tr><td>EnvironmentSatisfaction</td><td>Numerical</td><td>KS = 0.0381</td><td>0.236542</td><td class="status green">NOT REJECTED</td><td>Very close distribution</td></tr><tr><td>Gender</td><td>Categorical</td><td>χ² = 0.8796; TVD = 0.0177</td><td>0.348318</td><td class="status green">NOT REJECTED</td><td>Small category-distribution difference</td></tr><tr><td>HourlyRate</td><td>Numerical</td><td>KS = 0.0680</td><td>0.00221498</td><td class="status red">DIFFERENT</td><td>Moderate difference</td></tr><tr><td>JobInvolvement</td><td>Numerical</td><td>KS = 0.1456</td><td>5.34051e-14</td><td class="status red">DIFFERENT</td><td>Noticeable distribution difference</td></tr><tr><td>JobLevel</td><td>Numerical</td><td>KS = 0.0299</td><td>0.525727</td><td class="status green">NOT REJECTED</td><td>Very close distribution</td></tr><tr><td>JobRole</td><td>Categorical</td><td>χ² = 38.5741; TVD = 0.0762</td><td>5.89521e-06</td><td class="status red">DIFFERENT</td><td>Large category-distribution difference</td></tr><tr><td>JobSatisfaction</td><td>Numerical</td><td>KS = 0.0585</td><td>0.0130456</td><td class="status red">DIFFERENT</td><td>Moderate difference</td></tr><tr><td>MaritalStatus</td><td>Categorical</td><td>χ² = 2.8193; TVD = 0.0299</td><td>0.244233</td><td class="status green">NOT REJECTED</td><td>Small category-distribution difference</td></tr><tr><td>MonthlyIncome</td><td>Numerical</td><td>KS = 0.1537</td><td>1.43349e-15</td><td class="status red">DIFFERENT</td><td>Noticeable distribution difference</td></tr><tr><td>MonthlyRate</td><td>Numerical</td><td>KS = 0.0558</td><td>0.0206133</td><td class="status red">DIFFERENT</td><td>Moderate difference</td></tr><tr><td>NumCompaniesWorked</td><td>Numerical</td><td>KS = 0.0129</td><td>0.999694</td><td class="status green">NOT REJECTED</td><td>Very close distribution</td></tr><tr><td>Over18</td><td>Categorical</td><td>χ² = 0.0000; TVD = 0.0000</td><td>1</td><td class="status green">NOT REJECTED</td><td>Small category-distribution difference</td></tr><tr><td>OverTime</td><td>Categorical</td><td>χ² = 8.7310; TVD = 0.0510</td><td>0.00312838</td><td class="status red">DIFFERENT</td><td>Moderate category-distribution difference</td></tr><tr><td>PercentSalaryHike</td><td>Numerical</td><td>KS = 0.2020</td><td>1.17352e-26</td><td class="status red">DIFFERENT</td><td>Noticeable distribution difference</td></tr><tr><td>PerformanceRating</td><td>Numerical</td><td>KS = 0.0020</td><td>1</td><td class="status green">NOT REJECTED</td><td>Very close distribution</td></tr><tr><td>RelationshipSatisfaction</td><td>Numerical</td><td>KS = 0.0980</td><td>1.46919e-06</td><td class="status red">DIFFERENT</td><td>Moderate difference</td></tr><tr><td>StandardHours</td><td>Numerical</td><td>KS = 0.0000</td><td>1</td><td class="status green">NOT REJECTED</td><td>Very close distribution</td></tr><tr><td>StockOptionLevel</td><td>Numerical</td><td>KS = 0.0177</td><td>0.975639</td><td class="status green">NOT REJECTED</td><td>Very close distribution</td></tr><tr><td>TotalWorkingYears</td><td>Numerical</td><td>KS = 0.1442</td><td>9.57179e-14</td><td class="status red">DIFFERENT</td><td>Noticeable distribution difference</td></tr><tr><td>TrainingTimesLastYear</td><td>Numerical</td><td>KS = 0.0469</td><td>0.0784122</td><td class="status green">NOT REJECTED</td><td>Very close distribution</td></tr><tr><td>WorkLifeBalance</td><td>Numerical</td><td>KS = 0.0313</td><td>0.467934</td><td class="status green">NOT REJECTED</td><td>Very close distribution</td></tr><tr><td>YearsAtCompany</td><td>Numerical</td><td>KS = 0.0619</td><td>0.00714123</td><td class="status red">DIFFERENT</td><td>Moderate difference</td></tr><tr><td>YearsInCurrentRole</td><td>Numerical</td><td>KS = 0.2156</td><td>2.44661e-30</td><td class="status red">DIFFERENT</td><td>Noticeable distribution difference</td></tr><tr><td>YearsSinceLastPromotion</td><td>Numerical</td><td>KS = 0.1088</td><td>5.3136e-08</td><td class="status red">DIFFERENT</td><td>Noticeable distribution difference</td></tr><tr><td>YearsWithCurrManager</td><td>Numerical</td><td>KS = 0.1891</td><td>2.17865e-23</td><td class="status red">DIFFERENT</td><td>Noticeable distribution difference</td></tr></tbody></table></div>
+<div class="two"><div class="card"><h3>What the fidelity metrics mean</h3><p><b>KS statistic:</b> compares the distributions of a numerical column. Lower values mean the two distributions are closer.</p><p><b>KS p-value:</b> a value ≥ 0.05 means this test does not provide strong evidence of a distribution difference at the 5% level. It does not prove the datasets are identical.</p><p><b>Chi-square:</b> compares categorical frequency distributions. Lower values generally indicate less discrepancy.</p><p><b>TVD:</b> total variation distance measures the difference between category proportions. 0 means identical proportions.</p></div><div class="card"><h3>Human-readable deduction</h3><p>The CTGAN output preserves several broad structural patterns, including zero missing values and many similar numerical/categorical ranges. However, the fidelity tests show noticeable differences for a number of columns, including some important HR fields such as Attrition, JobRole, MonthlyIncome, YearsInCurrentRole and YearsWithCurrManager.</p><p><b>Deduction:</b> this particular CTGAN run produces usable synthetic-looking HR records, but the statistical evidence does not support treating the synthetic dataset as a close replacement for the real dataset across every column.</p></div></div>
+<h2>6. When to Use This Synthetic Data</h2><div class="card"><ul><li><b>Suitable for:</b> development, demonstrations, dashboard prototyping, pipeline testing and exploratory analysis where exact employee records are not required.</li><li><b>Use with caution:</b> analyses where accurate reproduction of attrition rates, job-role distributions, income distributions or long-term employment relationships is critical.</li><li><b>Before production use:</b> repeat the benchmark with the exact downstream task, compare correlations and joint distributions, and validate whether the synthetic data supports the intended analytical conclusions.</li></ul></div>
+
+<h2>7. Methods Used Across the Synthetic-Data Study</h2>
+<div class="note"><b>Important:</b> The methods below were not all tested under the same dataset, hardware, or scale. The report therefore separates <b>measured experiments</b> from <b>experiments affected by environment/compilation issues</b> and from <b>research-only evaluations</b>. This avoids treating an uncompleted benchmark as a measured result.</div>
+
+<div class="method-card">
+<span class="method-tag failed">LOCAL EXPERIMENT — AFFECTED BY COMPILATION / ENVIRONMENT</span>
+<h3>GReaT — Transformer-based Tabular Generation</h3>
+<p>GReaT uses a transformer/language-model style approach to learn how values in tabular records relate to each other and then generate new records.</p>
+<div class="flow">Tabular rows → transformer representation → learned relationships → generated tabular rows</div>
+<div class="method-grid">
+<div class="box"><h4>What happened in our environment</h4><ul><li>The experiment could not be turned into a clean standardized benchmark.</li><li>The environment had compilation/toolchain limitations, including the <b>KeOps C++ / compiler dependency</b>.</li><li>CUDA/GPU acceleration was not available in the environment, leaving the workload CPU-bound.</li><li>Because of these environment limitations, larger-scale transformer generation was not practical to benchmark fairly.</li></ul></div>
+<div class="box"><h4>Why GPU/compilation matters</h4><p>Transformer workloads perform many matrix operations and are normally much faster on a compatible GPU. Some dependencies used in the surrounding stack can also require native compilation. If CUDA libraries or a working C++ compiler are unavailable, the pipeline can fail before generation or fall back to much slower CPU execution.</p><p><b>Important:</b> this is a limitation of our local setup, not proof that GReaT cannot generate synthetic data.</p></div>
+</div>
+<div class="callout warn"><b>Deduction:</b> GReaT needs a properly configured environment for a meaningful large-scale benchmark. Our local compilation and GPU limitations prevented us from treating it as a comparable measured result.</div>
+</div>
+
+<div class="method-card">
+<span class="method-tag failed">LOCAL EXPERIMENT — AFFECTED BY COMPILATION / GPU / DATA PREPARATION</span>
+<h3>DDPM / TabDDPM — Diffusion for Tabular Data</h3>
+<p>Diffusion models generate data by learning to reverse a gradual noise process. TabDDPM adapts this idea to tabular numerical and categorical data.</p>
+<div class="flow">Real tabular data → add noise → learn denoising → start from noise → reverse denoising → synthetic rows</div>
+<div class="method-grid">
+<div class="box"><h4>Problems encountered</h4><ul><li>The environment was <b>CPU-only</b>; CUDA/GPU libraries were unavailable.</li><li>KeOps reported that a C++ compiler / <b>g++ / CXX</b> was unavailable.</li><li>OpenMP/CUDA-related environment limitations were also observed.</li><li>A categorical preprocessing error occurred: <b>“Class values must be non-negative”</b>.</li></ul></div>
+<div class="box"><h4>What the error means</h4><p>The compilation problem means part of the computational stack could not build/use its native accelerated components. The categorical error is separate: the data encoding did not match what that implementation expected.</p><p>Therefore, we cannot fairly report a standardized DDPM runtime or fidelity score from this experiment.</p></div>
+</div>
+<div class="callout bad"><b>Deduction:</b> The DDPM/TabDDPM attempt was blocked by environment and preprocessing issues. The correct conclusion is <b>“the local benchmark could not be completed cleanly”</b>, not “diffusion models do not work.”</div>
+</div>
+
+<div class="method-card">
+<span class="method-tag tested">MEASURED — NVIDIA NEMO DATA DESIGNER</span>
+<h3>NVIDIA NeMo Data Designer</h3>
+<p>NeMo Data Designer is a configurable synthetic-data generation framework. In our test, we used it to generate product-review data by combining structured category values with LLM-generated text.</p>
+<div class="flow">product_category → prompt using the category → NVIDIA model → generated review → synthetic product-review dataset</div>
+<h4>Our recorded experiment</h4>
+<div class="table-wrap"><table class="method-table"><thead><tr><th>Metric</th><th>Recorded result</th><th>What it means</th></tr></thead><tbody>
+<tr><td>Records requested</td><td><b>10</b></td><td>Number of synthetic records requested.</td></tr>
+<tr><td>Records generated</td><td><b>10</b></td><td>All requested records were produced.</td></tr>
+<tr><td>Completion</td><td><b>100%</b></td><td>10 out of 10 records completed successfully.</td></tr>
+<tr><td>Columns</td><td><b>2</b></td><td><code>product_category</code> and generated <code>review</code>.</td></tr>
+<tr><td>Runtime</td><td><b>127.8 sec</b></td><td>Recorded time for this small 10-record generation run.</td></tr>
+<tr><td>Input tokens</td><td><b>298</b></td><td>Approximate amount of model input/context sent.</td></tr>
+<tr><td>Output tokens</td><td><b>1,896</b></td><td>Tokens produced by the model; mainly generated review content.</td></tr>
+<tr><td>Total tokens</td><td><b>2,194</b></td><td>298 input + 1,896 output.</td></tr>
+<tr><td>Maximum parallel requests</td><td><b>4</b></td><td>Up to four generation requests could be processed concurrently.</td></tr>
+<tr><td>Temperature</td><td><b>1.00</b></td><td>Controls variation/randomness in generated text.</td></tr>
+<tr><td>Top-p</td><td><b>0.95</b></td><td>Controls the probability range considered during token generation.</td></tr>
+<tr><td>Thinking</td><td><b>Disabled</b></td><td>The configured generation task ran with <code>enable_thinking=False</code>.</td></tr>
+<tr><td>Model</td><td><b>nvidia/nemotron-3.5-lightning-30b-a3b</b></td><td>Model alias used in our working configuration.</td></tr>
+</tbody></table></div>
+<div class="method-grid">
+<div class="box"><h4>What we configured</h4><ul><li><code>product_category</code> values: Electronics, Clothing, Home &amp; Kitchen, Books.</li><li><code>review</code> generated from a prompt containing the product category.</li><li>Maximum parallel requests: 4.</li><li>Temperature: 1.00.</li><li>Top-p: 0.95.</li><li>Thinking disabled.</li></ul></div>
+<div class="box"><h4>How to interpret the result</h4><p>The 100% completion result tells us the configured workflow successfully generated every requested record. The 127.8-second runtime is a measurement for <b>10 records only</b>; it is not a million-row scalability benchmark. Token counts describe model usage, not statistical fidelity.</p></div>
+</div>
+<div class="callout good"><b>Deduction:</b> NeMo Data Designer successfully completed the small configured generation task and gave us useful operational metrics such as completion, runtime, concurrency and token usage. A separate real-vs-synthetic fidelity benchmark would be needed to measure statistical similarity.</div>
+</div>
+
+<div class="method-card">
+<span class="method-tag research">RESEARCH / EVALUATION — NO LOCAL BENCHMARK</span>
+<h3>Google Simula</h3>
+<p>Google Simula was part of our research/evaluation of synthetic-data approaches. It was not run locally as a standardized experiment in this project.</p>
+<div class="method-grid"><div class="box"><h4>Status</h4><ul><li>Local generation: not performed.</li><li>Local runtime: not measured.</li><li>Local fidelity score: not measured.</li><li>Large-scale benchmark: not performed.</li></ul></div><div class="box"><h4>Why it is separated</h4><p>Without running the same dataset through the method and collecting the same metrics, it would be misleading to place a measured runtime or fidelity score beside CTGAN's results.</p></div></div>
+</div>
+
+<div class="method-card">
+<span class="method-tag research">RESEARCH / EVALUATION — NO LOCAL BENCHMARK</span>
+<h3>MOSTLY AI</h3>
+<p>MOSTLY AI was also considered as an established synthetic-data platform for tabular and other structured data. In this project it was researched/evaluated conceptually rather than benchmarked locally.</p>
+<div class="method-grid"><div class="box"><h4>Status</h4><ul><li>Local generation: not performed.</li><li>Local runtime: not measured.</li><li>Local fidelity score: not measured.</li><li>Direct comparison with CTGAN: not performed.</li></ul></div><div class="box"><h4>Interpretation</h4><p>It remains a candidate platform to test later under the same benchmark protocol rather than a source of invented project-specific measurements.</p></div></div>
+</div>
+
+<h2>8. Cross-Method Comparison</h2>
+<div class="table-wrap"><table class="method-table"><thead><tr><th>Method</th><th>What we did</th><th>Project result</th><th>Main limitation / note</th></tr></thead><tbody>
+<tr><td><b>CTGAN</b></td><td>Generated 1,470 HR records and compared them with 1,470 real records.</td><td>Full visual, profiling and fidelity analysis available.</td><td>Fidelity varies by column; generation success does not equal perfect similarity.</td></tr>
+<tr><td><b>GReaT</b></td><td>Attempted transformer-based tabular generation.</td><td>Could not produce a clean comparable benchmark in our final environment.</td><td>Compilation/toolchain and CPU/GPU limitations affected the run.</td></tr>
+<tr><td><b>DDPM / TabDDPM</b></td><td>Attempted diffusion-based tabular generation.</td><td>Could not complete a clean standardized benchmark.</td><td>CPU/CUDA and C++ compilation limitations plus categorical encoding error.</td></tr>
+<tr><td><b>NeMo Data Designer</b></td><td>Generated 10 product-review records from a structured configuration.</td><td>10/10 records; 100% completion; 127.8 sec.</td><td>Small test; no statistical fidelity benchmark.</td></tr>
+<tr><td><b>Google Simula</b></td><td>Research/evaluation only.</td><td>No local measurement.</td><td>Needs same-dataset benchmark before direct comparison.</td></tr>
+<tr><td><b>MOSTLY AI</b></td><td>Research/evaluation only.</td><td>No local measurement.</td><td>Needs same-dataset benchmark before direct comparison.</td></tr>
+</tbody></table></div>
+
+<h2>9. What We Actually Learned</h2>
+<div class="method-card"><ol>
+<li><b>Generation success is not the same as fidelity.</b> A model can generate the requested number of rows while still producing distributions that differ from the real dataset.</li>
+<li><b>Hardware and environment matter.</b> Transformer and diffusion workloads can be heavily affected by missing CUDA support, native C++ compilers and related dependencies.</li>
+<li><b>Data preparation matters.</b> The TabDDPM attempt showed that categorical encoding can prevent a run before model quality can even be evaluated.</li>
+<li><b>Runtime must be recorded separately.</b> NeMo's 127.8 seconds describes one 10-record experiment, while no runtime was recorded for CTGAN and no clean runtime was established for the failed GReaT/DDPM attempts.</li>
+<li><b>Small tests do not prove scalability.</b> None of the small successful tests should be presented as evidence of million-row performance.</li>
+<li><b>A fair comparison needs one benchmark protocol.</b> The same dataset, same input size, same synthetic output size, same hardware, same preprocessing, same fidelity metrics and recorded training/generation/resource usage should be used.</li>
+</ol></div>
+
+<h2>10. When to Use Each Method</h2>
+<div class="table-wrap"><table class="method-table"><thead><tr><th>Method</th><th>Useful when</th><th>Keep in mind</th></tr></thead><tbody>
+<tr><td><b>CTGAN</b></td><td>Structured tabular data needs synthetic rows while preserving numerical/categorical patterns.</td><td>Always validate fidelity; some columns can match better than others.</td></tr>
+<tr><td><b>GReaT</b></td><td>Transformer-based generation is of interest and adequate compute/tooling is available.</td><td>GPU and native dependencies can materially affect practical execution.</td></tr>
+<tr><td><b>DDPM / TabDDPM</b></td><td>Diffusion-based tabular generation is being evaluated with compatible preprocessing and GPU support.</td><td>Environment and categorical encoding must be validated first.</td></tr>
+<tr><td><b>NeMo Data Designer</b></td><td>Prompt/configuration-driven generation is useful, especially for synthetic text or controlled scenarios.</td><td>Operational success metrics do not replace statistical fidelity testing.</td></tr>
+<tr><td><b>Google Simula</b></td><td>Researching/evaluating newer synthetic-data approaches.</td><td>Run the same benchmark before drawing project-specific conclusions.</td></tr>
+<tr><td><b>MOSTLY AI</b></td><td>Evaluating an established synthetic-data platform/workflow.</td><td>Project-specific runtime and fidelity still need to be measured locally.</td></tr>
+</tbody></table></div>
+
+
+
+<h2>11. Estimated Pros and Cons of Each Method</h2>
+<div class="note"><b>How to read this section:</b> These pros and cons are <b>estimated method-level characteristics</b>, not additional measured results from the experiments above. Method-specific limitations are separated from common runtime, memory and hardware considerations so the same infrastructure limitation is not repeated for every method.</div>
+
+<div class="method-card">
+<span class="method-tag tested">CTGAN</span>
+<h3>CTGAN — Estimated Pros and Cons</h3>
+<div class="method-grid">
+<div class="box"><h4>Pros</h4><ul>
+<li>Designed specifically for tabular data containing both numerical and categorical columns.</li>
+<li>Can learn non-linear relationships between columns and generate new combinations rather than simply copying rows.</li>
+<li>Well suited to mixed business datasets such as HR, customer and transactional tables.</li>
+<li>Synthetic output can be evaluated using familiar profiling and statistical fidelity checks.</li>
+</ul></div>
+<div class="box"><h4>Cons</h4><ul>
+<li>Highly imbalanced categorical columns can be difficult to reproduce accurately, especially when some categories have very few examples.</li>
+<li>Rare categories or minority patterns may be underrepresented or missed in generated data.</li>
+<li>GAN training can be unstable and results can vary between training runs.</li>
+<li>Mode collapse can reduce the diversity of generated records by concentrating on only part of the real distribution.</li>
+<li>Good overall distributions do not guarantee that every individual column is reproduced equally well.</li>
+<li>Complex relationships involving several columns may be harder to preserve than individual column distributions.</li>
+<li>Hyperparameters and training configuration can noticeably affect synthetic-data quality.</li>
+<li>Successful generation does not itself provide a privacy guarantee; privacy and memorization risk require separate evaluation.</li>
+</ul></div>
+</div></div>
+
+<div class="method-card">
+<span class="method-tag limited">GReaT</span>
+<h3>GReaT — Estimated Pros and Cons</h3>
+<div class="method-grid">
+<div class="box"><h4>Pros</h4><ul>
+<li>Uses transformer-based modelling and provides an alternative to GAN and diffusion approaches.</li>
+<li>Can represent complex relationships between fields through a language-model-style representation.</li>
+<li>Useful for investigating contextual dependencies between attributes.</li>
+<li>Provides a useful comparison point for transformer-based tabular generation.</li>
+</ul></div>
+<div class="box"><h4>Cons</h4><ul>
+<li>Converting structured rows into a textual representation adds another modelling layer between the original table and generated data.</li>
+<li>Output quality can depend strongly on how column names, values and records are represented as text.</li>
+<li>Generated records may require post-processing and validation before being treated as valid structured data.</li>
+<li>Strict numerical relationships and numerical precision can be harder to control through language-model generation.</li>
+<li>Invalid or logically inconsistent combinations can be generated unless constraints or validation are applied.</li>
+<li>Results depend partly on the behaviour and limitations of the underlying pretrained language model.</li>
+<li>Rare categories and unusual combinations may still be difficult to reproduce reliably.</li>
+<li>Rows may appear plausible without preserving the real dataset's statistical distributions, so fidelity testing remains necessary.</li>
+</ul></div>
+</div></div>
+
+<div class="method-card">
+<span class="method-tag limited">DDPM / TabDDPM</span>
+<h3>DDPM / TabDDPM — Estimated Pros and Cons</h3>
+<div class="method-grid">
+<div class="box"><h4>Pros</h4><ul>
+<li>Provides a diffusion-based alternative to adversarial GAN training.</li>
+<li>TabDDPM is designed specifically for tabular data.</li>
+<li>Can model complex tabular distributions when numerical and categorical variables are represented appropriately.</li>
+<li>Useful for comparing modern diffusion approaches with GAN and transformer-based methods.</li>
+</ul></div>
+<div class="box"><h4>Cons</h4><ul>
+<li>Tabular datasets contain heterogeneous feature types, making joint modelling of continuous and discrete variables challenging.</li>
+<li>Categorical and continuous variables require different treatment and careful preprocessing.</li>
+<li>Discrete variables remain a difficult part of tabular diffusion modelling.</li>
+<li>Mixed-type features can be especially difficult to represent correctly.</li>
+<li>Output quality can depend on diffusion configuration and the selected noise/denoising process.</li>
+<li>Rare classes and unusual regions of the original distribution can require additional attention.</li>
+<li>Generated records still need validation for business rules and logical consistency.</li>
+<li>Preprocessing or encoding mistakes can prevent training or lead to misleading synthetic output.</li>
+</ul></div>
+</div></div>
+
+<div class="method-card">
+<span class="method-tag tested">NVIDIA NeMo Data Designer</span>
+<h3>NVIDIA NeMo Data Designer — Estimated Pros and Cons</h3>
+<div class="method-grid">
+<div class="box"><h4>Pros</h4><ul>
+<li>Provides a configuration-driven workflow for controlled synthetic-data generation.</li>
+<li>Useful for text-rich and dependent-field generation.</li>
+<li>Supports composable stages, column dependencies, validators and quality checks.</li>
+<li>Supports multi-model workflows and model routing across generation stages.</li>
+</ul></div>
+<div class="box"><h4>Cons</h4><ul>
+<li>Data Designer orchestrates generation but does not host the underlying models, so output quality depends partly on the configured model endpoint/provider.</li>
+<li>Complex datasets can require careful design of prompts, column dependencies, constraints and validators.</li>
+<li>Overloading a single generation call with schema, diversity, content and quality requirements can reduce output quality.</li>
+<li>Generated text can still contain incorrect, hallucinated or logically inconsistent information.</li>
+<li>Schema compliance does not automatically mean the generated dataset preserves the desired statistical distribution.</li>
+<li>Provider availability, API behaviour and rate limits can affect a generation workflow.</li>
+<li>Different underlying models can produce noticeably different datasets from the same high-level configuration.</li>
+<li>Quality checks and validators must still be designed for the intended use case rather than assuming generated records are automatically correct.</li>
+</ul></div>
+</div></div>
+
+<div class="method-card">
+<span class="method-tag research">Google Simula</span>
+<h3>Google Simula — Estimated Pros and Cons</h3>
+<div class="method-grid">
+<div class="box"><h4>Pros</h4><ul>
+<li>Explores reasoning-first synthetic dataset design rather than only learning a distribution from an existing table.</li>
+<li>Useful when dataset coverage, complexity and quality need to be deliberately designed.</li>
+<li>Provides a different research direction from conventional tabular GAN and diffusion generation.</li>
+<li>Can be useful for constructing training or evaluation scenarios from first-principles mechanisms.</li>
+</ul></div>
+<div class="box"><h4>Cons</h4><ul>
+<li>Dataset quality depends strongly on the reasoning capability of the underlying model.</li>
+<li>Reasoning errors can propagate into the generated dataset design.</li>
+<li>A carefully designed mechanism can still encode incorrect assumptions about the target domain.</li>
+<li>Because the approach can be seedless, its generated distribution is not simply learned from a real reference table.</li>
+<li>Domain-specific generation requires careful specification of desired coverage, complexity and quality.</li>
+<li>Poorly defined target characteristics can produce a well-structured dataset that represents the wrong problem distribution.</li>
+<li>Generated examples still require downstream validation; reasoning-based generation does not automatically guarantee real-world validity.</li>
+<li>Direct comparison with CTGAN/TabDDPM-style real-to-synthetic fidelity testing is less straightforward because the generation objective is different.</li>
+</ul></div>
+</div></div>
+
+<div class="method-card">
+<span class="method-tag research">MOSTLY AI</span>
+<h3>MOSTLY AI — Estimated Pros and Cons</h3>
+<div class="method-grid">
+<div class="box"><h4>Pros</h4><ul>
+<li>Provides a dedicated synthetic-data workflow focused on structured/tabular data.</li>
+<li>Can reduce the amount of custom model engineering needed compared with building a generator from scratch.</li>
+<li>Includes privacy-oriented mechanisms and model quality reporting.</li>
+<li>Platform-oriented tooling can simplify end-to-end synthetic-data workflows.</li>
+</ul></div>
+<div class="box"><h4>Cons</h4><ul>
+<li>Rare-category protection can replace uncommon values with <code>_RARE_</code>, intentionally removing some original detail.</li>
+<li>Using sampled replacement for rare categories can alter the original categorical distribution by increasing frequencies of non-rare values.</li>
+<li>Privacy protection and statistical accuracy can therefore involve a trade-off.</li>
+<li>High-cardinality categorical columns and noisy categories require careful preparation and encoding choices.</li>
+<li>Incorrect encoding can create invalid synthetic values, such as treating categorical numeric codes as continuous measurements.</li>
+<li>Incorrectly formatted datetime fields can be interpreted as categorical values.</li>
+<li>Bivariate relationships between columns can become weakened or lost in synthetic data.</li>
+<li>Extreme-value privacy protection can intentionally remove unusual numerical or datetime cases before training, so some edge cases may not appear in the synthetic output.</li>
+</ul></div>
+</div></div>
+
+<div class="callout warn"><b>Common consideration across all synthetic-data methods:</b> Runtime, memory usage and hardware requirements depend on dataset size, model configuration, implementation and deployment environment. Because these factors are not unique to one generation method, they are not treated as method-specific disadvantages in this comparison.</div>
+
+<div class="callout warn"><b>Important:</b> The pros and cons above are intentionally labelled <b>estimated</b>. The measured experimental results elsewhere in this report remain unchanged and are the basis for project-specific conclusions.</div>
+
+<div class="note"><b>Overall conclusion:</b> In this project, CTGAN has the most complete measured analysis because we have both the real and synthetic HR datasets plus profiling results. NeMo Data Designer has a successful but much smaller operational test. GReaT and DDPM/TabDDPM were not clean comparable benchmarks in this project because their local experiments were affected by setup, dependency and/or preprocessing limitations. Google Simula and MOSTLY AI were research/evaluation items rather than local benchmark runs.</div>
+<footer>Generated from the supplied actual CSV, synthetic CSV, actual profiling JSON and synthetic profiling JSON. No values were invented. Fidelity statistics were calculated directly from the supplied CSV files.</footer>
+</div></body></html>
